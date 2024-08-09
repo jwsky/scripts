@@ -107,16 +107,10 @@ if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     nginx_config_file="$nginx_config_dir/${domain}.conf"
 
     # 生成代理配置内容
-    proxy_config="
-        location / {
-            proxy_pass $proxy_domain;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \$scheme;
-        }"
+    proxy_config=$(printf "\n        location / {\n            proxy_pass %s;\n            proxy_set_header X-Real-IP \$remote_addr;\n            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n            proxy_set_header X-Forwarded-Proto \$scheme;\n        }\n" "$proxy_domain")
 
     # 在443端口的server块中插入代理配置
-    sed -i "/listen 443 ssl http2;/, /access_log  \/home\/wwwlogs\/$domain.log;/s|location / {|&\n$proxy_config|" "$nginx_config_file"
+    sed -i "/listen 443 ssl http2;/, /access_log  \/home\/wwwlogs\/$domain.log;/s|access_log|$proxy_config\naccess_log|" "$nginx_config_file"
 
     # 测试 Nginx 配置是否正确
     nginx -t
