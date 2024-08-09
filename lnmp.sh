@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# 检查是否传入 MySQL 密码参数
+if [ -z "$1" ]; then
+    echo "请提供 MySQL 密码作为第一个参数。"
+    exit 1
+fi
+
+MYSQL_PASSWORD=$1
+
 # 删除 lnmp2.1 文件夹
 rm -rf lnmp2.1
 
@@ -35,39 +43,60 @@ set timeout -1
 spawn ./install.sh lnmp
 
 # 检测到 "your DataBase install" 提示符后停留 1 秒，然后输入 '5'
-expect "your DataBase install"
-sleep 1
-send "5\r"
+expect {
+    "your DataBase install" {
+        sleep 1
+        send "5\r"
+    }
+}
 
 # 检测到 "Using Generic Binaries" 提示符后停留 1 秒，然后输入 'y'
-expect "Using Generic Binaries"
-sleep 1
-send "y\r"
+expect {
+    "Using Generic Binaries" {
+        sleep 1
+        send "y\r"
+    }
+}
 
 # 检测到 "Please setup root password of MySQL" 提示符后停留 1 秒，然后输入 MySQL 密码
-expect "Please setup root password of MySQL"
-sleep 1
-send "$MYSQL_PASSWORD\r"
+expect {
+    "Please setup root password of MySQL" {
+        sleep 1
+        send "$MYSQL_PASSWORD\r"
+    }
+}
 
 # 检测到 "enable or disable the InnoDB Storage Engine" 提示符后停留 1 秒，然后输入 'y'
-expect "enable or disable the InnoDB Storage Engine"
-sleep 1
-send "y\r"
+expect {
+    "enable or disable the InnoDB Storage Engine" {
+        sleep 1
+        send "y\r"
+    }
+}
 
 # 检测到 "options for your PHP install" 提示符后停留 1 秒，然后输入 '14'
-expect "options for your PHP install"
-sleep 1
-send "14\r"
+expect {
+    "options for your PHP install" {
+        sleep 1
+        send "14\r"
+    }
+}
 
 # 检测到 "options for your Memory Allocator install" 提示符后停留 1 秒，然后输入 '1'
-expect "options for your Memory Allocator install"
-sleep 1
-send "1\r"
+expect {
+    "options for your Memory Allocator install" {
+        sleep 1
+        send "1\r"
+    }
+}
 
 # 检测到 "Press any key to install" 提示符后停留 1 秒，然后输入回车
-expect "Press any key to install"
-sleep 1
-send "\r"
+expect {
+    "Press any key to install" {
+        sleep 1
+        send "\r"
+    }
+}
 
 expect eof
 EOF
