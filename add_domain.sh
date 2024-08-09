@@ -77,16 +77,9 @@ expect "Enter 1, 2, 3"
 sleep 1
 send "2\r"
 set timeout 1
-expect {
-    "Please enter your email address" {
-        sleep 1
-        send "$random_email\r"
-    }
-    timeout {
-        puts "No email prompt, skipping..."
-    }
-}
-set timeout 60
+expect "Please enter your email address"
+sleep 1
+send "$random_email\r"
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
