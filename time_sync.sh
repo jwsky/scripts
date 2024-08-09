@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 删除脚本文件 time_sync.sh
+rm time_sync.sh
+
 # 检查是否安装了 chrony
 if dpkg -l | grep -q chrony; then
     echo "chrony 已安装，正在检查状态..."
