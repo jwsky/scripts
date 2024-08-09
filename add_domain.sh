@@ -37,7 +37,7 @@ fi
 # 生成随机20位字母的Gmail邮箱
 random_email=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 20 | head -n 1)@gmail.com
 echo "生成的随机邮箱: $random_email"
-
+random_email="dadasda@gmail.com"
 # 使用 expect 自动交互
 expect << EOF
 set timeout 3
