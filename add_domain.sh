@@ -40,7 +40,7 @@ echo "生成的随机邮箱: $random_email"
 
 # 使用 expect 自动交互
 expect << EOF
-set timeout -1  # 全局设置为不超时
+set timeout -1
 
 spawn lnmp vhost add
 expect "Please enter domain"
@@ -79,7 +79,7 @@ send "2\r"
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
-set timeout 1  # 针对邮箱部分设置1秒超时
+set timeout 1
 expect {
     "Please enter your email address" {
         sleep 1
@@ -89,7 +89,7 @@ expect {
         puts "No email prompt, skipping..."
     }
 }
-set timeout -1  # 恢复为不超时
+set timeout -1
 expect "Press any key to start create virtul host"
 send "\r"
 expect eof
@@ -98,7 +98,7 @@ EOF
 echo "虚拟主机添加完成。"
 
 # 询问是否设置反向代理
-read -t 20 -p "是否设置反向代理？(y/N): " set_proxy
+read -p "是否设置反向代理？(y/N): " set_proxy
 if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     read -p "请输入反代域名（注意https或者http需要保留）: " proxy_domain
 
