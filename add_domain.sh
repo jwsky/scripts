@@ -82,7 +82,7 @@ sleep 1
 send "y\r"
 set timeout 10  # 延长超时时间至10秒
 expect {
-    "Please enter your email address" {
+    "your email address" {
         sleep 1
         send "$random_email\r"
     }
