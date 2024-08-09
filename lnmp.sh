@@ -34,7 +34,7 @@ sed -i "s|Download_Mirror='https://soft.lnmp.com'|Download_Mirror='https://soft.
 
 # cd到src文件夹并下载新的MySQL包
 cd src
-wget https://soft.theucd.com/web/mtsql/mysql-8.0.37-linux-glibc2.12-x86_64.tar.xz
+wget https://soft.theucd.com/web/mysql/mysql-8.0.37-linux-glibc2.12-x86_64.tar.xz
 cd ..
 
 # 使用expect自动化安装过程
