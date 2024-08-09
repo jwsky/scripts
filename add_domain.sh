@@ -97,3 +97,39 @@ expect eof
 EOF
 
 echo "虚拟主机添加完成。"
+
+# 询问是否设置反向代理
+read -t 20 -p "是否设置反向代理？(y/N): " set_proxy
+if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    read -p "请输入反代域名（注意https或者http需要保留）: " proxy_domain
+
+    # Nginx 配置文件目录
+    nginx_config_dir="/usr/local/nginx/conf/vhost"
+    nginx_config_file="$nginx_config_dir/${domain}.conf"
+
+    # 代理配置内容
+    proxy_config=$(cat <<EOF
+
+        location / {
+            proxy_pass $proxy_domain;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }
+EOF
+    )
+
+    # 在 Nginx 配置文件中插入代理配置
+    sed -i "/access_log  \/home\/wwwlogs\/$domain.log;/i\\$proxy_config" $nginx_config_file
+
+    # 测试 Nginx 配置是否正确
+    nginx -t
+
+    # 重启 Nginx 服务使配置生效
+    systemctl restart nginx
+
+    echo "反向代理已设置完成并应用。"
+else
+    echo "未设置反向代理，脚本结束。"
+    exit 0
+fi
