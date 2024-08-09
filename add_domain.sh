@@ -40,7 +40,7 @@ echo "生成的随机邮箱: $random_email"
 
 # 使用 expect 自动交互
 expect << EOF
-set timeout 30
+set timeout -1
 
 spawn lnmp vhost add
 expect "Please enter domain"
@@ -76,6 +76,9 @@ send "y\r"
 expect "Enter 1, 2, 3"
 sleep 1
 send "2\r"
+expect "Using 301 to Redirect HTTP to HTTPS"
+sleep 1
+send "y\r"
 set timeout 1
 expect {
     "Please enter your email address" {
@@ -86,10 +89,6 @@ expect {
         puts "No email prompt, skipping..."
     }
 }
-
-expect "Using 301 to Redirect HTTP to HTTPS"
-sleep 1
-send "y\r"
 set timeout -1
 expect "Press any key to start create virtul host"
 send "\r"
@@ -107,20 +106,16 @@ if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     nginx_config_dir="/usr/local/nginx/conf/vhost"
     nginx_config_file="$nginx_config_dir/${domain}.conf"
 
-    # 代理配置内容
-    proxy_config=$(cat <<EOF
-
-        location / {
-            proxy_pass $proxy_domain;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \$scheme;
-        }
-EOF
-    )
+    # 生成代理配置内容
+    proxy_config="\\n        location / {\\n"
+    proxy_config+="            proxy_pass $proxy_domain;\\n"
+    proxy_config+="            proxy_set_header X-Real-IP \$remote_addr;\\n"
+    proxy_config+="            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\\n"
+    proxy_config+="            proxy_set_header X-Forwarded-Proto \$scheme;\\n"
+    proxy_config+="        }\\n"
 
     # 在 Nginx 配置文件中插入代理配置
-    sed -i "/access_log  \/home\/wwwlogs\/$domain.log;/i\\$proxy_config" $nginx_config_file
+    sed -i "/access_log  \/home\/wwwlogs\/$domain.log;/i\\$proxy_config" "$nginx_config_file"
 
     # 测试 Nginx 配置是否正确
     nginx -t
