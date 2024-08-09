@@ -37,10 +37,10 @@ fi
 # 生成随机20位字母的Gmail邮箱
 random_email=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 20 | head -n 1)@gmail.com
 echo "生成的随机邮箱: $random_email"
-random_email="dadasda@gmail.com"
+
 # 使用 expect 自动交互
 expect << EOF
-set timeout 3
+set timeout -1
 log_user 1  # 启用 expect 的输出日志
 
 spawn lnmp vhost add
@@ -80,9 +80,9 @@ send "2\r"
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
-set timeout 3  # 延长超时时间至10秒
+set timeout 2  # 延长超时时间至10秒
 expect {
-    "your email address" {
+    -re "(.*)?your email address(.*)?" {
         sleep 1
         send "$random_email\r"
     }
