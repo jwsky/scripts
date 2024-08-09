@@ -40,7 +40,7 @@ echo "生成的随机邮箱: $random_email"
 
 # 使用 expect 自动交互
 expect << EOF
-set timeout -1
+set timeout 3
 log_user 1  # 启用 expect 的输出日志
 
 spawn lnmp vhost add
@@ -80,7 +80,7 @@ send "2\r"
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
-set timeout 10  # 延长超时时间至10秒
+set timeout 3  # 延长超时时间至10秒
 expect {
     "your email address" {
         sleep 1
