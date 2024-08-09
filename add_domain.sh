@@ -40,8 +40,7 @@ echo "生成的随机邮箱: $random_email"
 
 # 使用 expect 自动交互
 expect << EOF
-set timeout -1
-log_user 1  # 启用 expect 的输出日志
+set timeout 60
 
 spawn lnmp vhost add
 expect "Please enter domain"
@@ -77,12 +76,20 @@ send "y\r"
 expect "Enter 1, 2, 3"
 sleep 1
 send "2\r"
+set timeout 1
+expect {
+    "Please enter your email address" {
+        sleep 1
+        send "$random_email\r"
+    }
+    timeout {
+        puts "No email prompt, skipping..."
+    }
+}
+set timeout 60
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
-sleep 2  # 添加延时，等待提示出现
-send "$random_email\r"  # 直接发送邮箱地址
-set timeout -1
 expect "Press any key to start create virtul host"
 send "\r"
 expect eof
