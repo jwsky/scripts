@@ -39,7 +39,7 @@ random_email=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 20 | head -n 1)@gmail.c
 echo "生成的随机邮箱: $random_email"
 
 # 使用 expect 自动交互
-expect << EOF | tee expect_output.log
+expect << EOF
 set timeout -1
 log_user 1  # 启用 expect 的输出日志
 
@@ -80,16 +80,8 @@ send "2\r"
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
-set timeout 10  # 延长超时时间至10秒
-expect {
-    -re "(.*)?email(.*)?" {
-        sleep 1
-        send "$random_email\r"
-    }
-    timeout {
-        puts "No email prompt, skipping..."
-    }
-}
+sleep 2  # 添加延时，等待提示出现
+send "$random_email\r"  # 直接发送邮箱地址
 set timeout -1
 expect "Press any key to start create virtul host"
 send "\r"
