@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # 检查是否安装了expect
-if ! command -v expect &> /dev/null
-then
+if ! command -v expect; then
     echo "expect 未安装，正在安装..."
     sudo apt-get update
     sudo apt-get install -y expect
@@ -26,13 +25,13 @@ if [ -z "$domain" ]; then
     exit 1
 fi
 
-# 检测域名解析是否指向本机外网IP
+# 检测域名解析是否返回有效IP
 domain_ip=$(ping -c 1 $domain | sed -nE 's/.*\(([^)]+)\).*/\1/p')
-echo "$domain 的 IP 地址: $domain_ip"
-
-if [ "$domain_ip" != "$external_ip" ]; then
-    echo "域名 IP 与本机外网 IP 不匹配，脚本终止。"
-  #  exit 1
+if [ -z "$domain_ip" ]; then
+    echo "无法解析域名 $domain，脚本终止。"
+    exit 1
+else
+    echo "$domain 的 IP 地址: $domain_ip"
 fi
 
 # 生成随机20位字母的Gmail邮箱
