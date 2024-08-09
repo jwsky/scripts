@@ -115,8 +115,8 @@ if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             proxy_set_header X-Forwarded-Proto \$scheme;
         }"
 
-    # 在 Nginx 配置文件中插入代理配置
-    sed -i "/access_log  \/home\/wwwlogs\/$domain.log;/i\\$proxy_config" "$nginx_config_file"
+    # 在443端口的server块中插入代理配置
+    sed -i "/listen 443 ssl http2;/, /access_log  \/home\/wwwlogs\/$domain.log;/s|location / {|&\n$proxy_config|" "$nginx_config_file"
 
     # 测试 Nginx 配置是否正确
     nginx -t
