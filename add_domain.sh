@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 检查是否安装了expect
-if ! command -v expect; then
+if ! command -v expect >/dev/null 2>&1; then
     echo "expect 未安装，正在安装..."
     sudo apt-get update
     sudo apt-get install -y expect
