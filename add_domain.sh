@@ -90,7 +90,7 @@ expect {
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 1
 send "y\r"
-set timeout 30
+set timeout -1
 expect "Press any key to start create virtul host"
 send "\r"
 expect eof
