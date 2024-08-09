@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# 删除 lnmp2.1 文件夹
+rm -rf lnmp2.1
+
+# 删除 lnmp.sh 和 lnmp2.1.tar.gz 文件
+rm -f lnmp.sh lnmp2.1.tar.gz
+
 # 检查是否安装 expect
 if ! command -v expect &> /dev/null
 then
