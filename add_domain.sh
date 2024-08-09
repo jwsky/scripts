@@ -44,45 +44,45 @@ set timeout -1
 
 spawn lnmp vhost add
 expect "Please enter domain"
-sleep 1
+sleep 0.3
 send "$domain\r"
 expect "Enter more domain name"
-sleep 1
+sleep 0.3
 send "\r"
 expect "Default directory"
-sleep 1
+sleep 0.3
 send "\r"
 expect "Allow Rewrite rule"
-sleep 1
+sleep 0.3
 send "n\r"
 expect "Enable PHP Pathinfo"
-sleep 1
+sleep 0.3
 send "n\r"
 expect "Allow access log"
-sleep 1
+sleep 0.3
 send "y\r"
 expect "Enter access log filename"
-sleep 1
+sleep 0.3
 send "\r"
 expect "Enable IPv6"
-sleep 1
+sleep 0.3
 send "n\r"
 expect "Create database"
-sleep 1
+sleep 0.3
 send "n\r"
 expect "Add SSL Certificate"
-sleep 1
+sleep 0.3
 send "y\r"
 expect "Enter 1, 2, 3"
-sleep 1
+sleep 0.3
 send "2\r"
 expect "Using 301 to Redirect HTTP to HTTPS"
-sleep 1
+sleep 0.3
 send "y\r"
 set timeout 1
 expect {
     "Please enter your email address" {
-        sleep 1
+        sleep 0.3
         send "$random_email\r"
     }
     timeout {
@@ -107,10 +107,26 @@ if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     nginx_config_file="$nginx_config_dir/${domain}.conf"
 
     # 生成代理配置内容
-    proxy_config=$(printf "\n        location / {\n            proxy_pass %s;\n            proxy_set_header X-Real-IP \$remote_addr;\n            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n            proxy_set_header X-Forwarded-Proto \$scheme;\n        }\n" "$proxy_domain")
+    proxy_config=$(cat <<EOF
+        location / {
+            proxy_pass $proxy_domain;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }
+EOF
+    )
 
-    # 在443端口的server块中插入代理配置
-    sed -i "/listen 443 ssl http2;/, /access_log  \/home\/wwwlogs\/$domain.log;/s|access_log|$proxy_config\naccess_log|" "$nginx_config_file"
+    # 使用 awk 插入代理配置，仅插入到 443 端口的 server 块中
+    awk -v proxy_config="$proxy_config" '
+        /listen 443 ssl http2;/, /access_log/ {
+            if ($0 ~ /access_log/ && !inserted) {
+                print proxy_config
+                inserted = 1
+            }
+        }
+        { print }
+    ' "$nginx_config_file" > "${nginx_config_file}.tmp" && mv "${nginx_config_file}.tmp" "$nginx_config_file"
 
     # 测试 Nginx 配置是否正确
     nginx -t
