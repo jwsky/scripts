@@ -28,38 +28,39 @@ set timeout -1
 
 spawn ./install.sh lnmp
 
-# 输入 '5' 并等待 2 秒
+# 检测到 "your DataBase install" 提示符后停留 1 秒，然后输入 '5'
 expect "your DataBase install"
+sleep 1
 send "5\r"
-sleep 2
 
-# 输入 'y' 并等待 2 秒
+# 检测到 "Using Generic Binaries" 提示符后停留 1 秒，然后输入 'y'
 expect "Using Generic Binaries"
+sleep 1
 send "y\r"
-sleep 2
 
-# 输入 MySQL 密码 并等待 2 秒
+# 检测到 "Please setup root password of MySQL" 提示符后停留 1 秒，然后输入 MySQL 密码
 expect "Please setup root password of MySQL"
+sleep 1
 send "$MYSQL_PASSWORD\r"
-sleep 2
 
-# 输入 'y' 并等待 2 秒
+# 检测到 "enable or disable the InnoDB Storage Engine" 提示符后停留 1 秒，然后输入 'y'
 expect "enable or disable the InnoDB Storage Engine"
+sleep 1
 send "y\r"
-sleep 2
 
-# 输入 '14' 并等待 2 秒
+# 检测到 "options for your PHP install" 提示符后停留 1 秒，然后输入 '14'
 expect "options for your PHP install"
+sleep 1
 send "14\r"
-sleep 2
 
-# 输入 '1' 并等待 2 秒
+# 检测到 "options for your Memory Allocator install" 提示符后停留 1 秒，然后输入 '1'
 expect "options for your Memory Allocator install"
+sleep 1
 send "1\r"
-sleep 2
 
-# 输入回车
+# 检测到 "Press any key to install" 提示符后停留 1 秒，然后输入回车
 expect "Press any key to install"
+sleep 1
 send "\r"
 
 expect eof
