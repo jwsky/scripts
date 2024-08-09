@@ -107,12 +107,13 @@ if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     nginx_config_file="$nginx_config_dir/${domain}.conf"
 
     # 生成代理配置内容
-    proxy_config="\\n        location / {\\n"
-    proxy_config+="            proxy_pass $proxy_domain;\\n"
-    proxy_config+="            proxy_set_header X-Real-IP \$remote_addr;\\n"
-    proxy_config+="            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\\n"
-    proxy_config+="            proxy_set_header X-Forwarded-Proto \$scheme;\\n"
-    proxy_config+="        }\\n"
+    proxy_config="
+        location / {
+            proxy_pass $proxy_domain;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }"
 
     # 在 Nginx 配置文件中插入代理配置
     sed -i "/access_log  \/home\/wwwlogs\/$domain.log;/i\\$proxy_config" "$nginx_config_file"
