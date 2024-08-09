@@ -32,7 +32,7 @@ echo "$domain 的 IP 地址: $domain_ip"
 
 if [ "$domain_ip" != "$external_ip" ]; then
     echo "域名 IP 与本机外网 IP 不匹配，脚本终止。"
-    exit 1
+  #  exit 1
 fi
 
 # 生成随机20位字母的Gmail邮箱
