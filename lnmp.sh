@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# 检查是否提供了MySQL密码
-if [ -z "$1" ]; then
-  echo "请提供MySQL密码作为第一个参数。"
-  exit 1
+# 检查是否安装 expect
+if ! command -v expect &> /dev/null
+then
+    echo "expect 未安装。正在安装 expect..."
+    sudo apt-get update && sudo apt-get install -y expect
+else
+    echo "expect 已安装。"
 fi
-
-MYSQL_PASSWORD=$1
 
 # 下载并解压LNMP
 wget https://soft.lnmp.com/lnmp/lnmp2.1.tar.gz -O lnmp2.1.tar.gz
