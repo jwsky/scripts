@@ -98,44 +98,63 @@ EOF
 echo "虚拟主机添加完成。"
 
 # 询问是否设置反向代理
-read -p "是否设置反向代理？(y/N): " set_proxy
-if [[ "$set_proxy" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    read -p "请输入反代域名（注意https或者http需要保留）: " proxy_domain
+# 定义Nginx配置文件目录和域名
+nginx_config_dir="/usr/local/nginx/conf/vhost"
+domain=$1
+nginx_config_file="${nginx_config_dir}/${domain}.conf"
 
-    # Nginx 配置文件目录
-    nginx_config_dir="/usr/local/nginx/conf/vhost"
-    nginx_config_file="$nginx_config_dir/${domain}.conf"
+echo "配置文件路径：$nginx_config_file"
 
-    # 生成代理配置内容
-    proxy_config=$(cat <<EOF
-        location / {
-            proxy_pass $proxy_domain;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \$scheme;
-        }
-EOF
-    )
+echo "是否设置反向代理？(y/n)"
+read setup_proxy
 
-    # 使用 awk 插入代理配置，仅插入到 443 端口的 server 块中
-    awk -v proxy_config="$proxy_config" '
-        /listen 443 ssl http2;/, /access_log/ {
-            if ($0 ~ /access_log/ && !inserted) {
-                print proxy_config
-                inserted = 1
+if [ "$setup_proxy" = "y" ]; then
+    echo "请输入反向代理域名（包含http://或https://）:"
+    read reverse_domain
+
+    if [ ! -f "$nginx_config_file" ]; then
+        echo "错误：域名配置文件不存在!"
+        exit 1
+    fi
+
+    # 使用awk插入反向代理配置并删除特定行
+    awk -v rev_domain="$reverse_domain" -v OFS="\n" '
+    /}/ { last_brace_line = NR } # Track the last } line
+    /jpg/ { jpg_line = NR } # Track the line number with jpg
+    { lines[NR] = $0 } # Save all lines in an array
+    END {
+        # Print all lines before the last brace
+        for (i = 1; i < last_brace_line; i++) {
+            if (i == jpg_line) {
+                # Skip jpg line and the following 9 lines
+                i += 9;
+                continue;
             }
+            print lines[i]
         }
-        { print }
-    ' "$nginx_config_file" > "${nginx_config_file}.tmp" && mv "${nginx_config_file}.tmp" "$nginx_config_file"
+        # Insert reverse proxy configuration
+        print "    location / {"
+        print "        proxy_pass " rev_domain ";"
+        print "        proxy_http_version 1.1;"
+        print "        proxy_set_header Upgrade $http_upgrade;"
+        print "        proxy_set_header Connection '\''upgrade'\'';"
+        print "        proxy_set_header X-Real-IP $remote_addr;"
+        print "        proxy_set_header Host $host;"
+        print "        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"
+        print "        proxy_set_header X-Forwarded-Proto $scheme;"
+        print "        proxy_set_header X-Forwarded-Host $host;"
+        print "        proxy_cache_bypass $http_upgrade;"
+        print "    }"
+        # Print the last brace
+        print lines[last_brace_line]
+    }' $nginx_config_file > temp_file
 
-    # 测试 Nginx 配置是否正确
-    nginx -t
+    # Replace the old configuration file with the new one
+    mv temp_file $nginx_config_file
 
-    # 重启 Nginx 服务使配置生效
-    systemctl restart nginx
-
-    echo "反向代理已设置完成并应用。"
+    echo "正在重启nginx..."
+    lnmp nginx restart
 else
-    echo "未设置反向代理，脚本结束。"
-    exit 0
+    echo "未设置反向代理。"
 fi
+
