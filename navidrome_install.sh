@@ -28,6 +28,10 @@ sudo apt install vim ffmpeg -y
 HOME_DIR="/home/$USER"
 NAVIDROME_DIR="$HOME_DIR/navidrome"
 sudo mkdir -p $NAVIDROME_DIR
+sudo mkdir -p $NAVIDROME_DIR/bin
+mkdir -p $NAVIDROME_DIR/music-library
+mkdir -p $NAVIDROME_DIR/config
+# 赋予文件夹适当的权限
 sudo chown -R $USER:$GROUP $NAVIDROME_DIR
 
 # 检查文件是否存在于当前脚本执行的目录下
@@ -37,7 +41,7 @@ if [ ! -f "./$FILENAME" ]; then
 fi
 
 # 复制文件到 bin 目录
-mkdir -p $NAVIDROME_DIR/bin
+
 echo "复制文件到 $NAVIDROME_DIR/bin/"
 ls -l /root/$FILENAME
 sudo cp -n /root/$FILENAME $NAVIDROME_DIR/bin/
@@ -48,14 +52,8 @@ if [ ! -d "navidrome" ]; then
 	    echo "解压文件 $FILENAME ..."
 	        sudo tar -xvzf $FILENAME
 fi
-cd -
-
-# 赋予文件夹适当的权限
-sudo chown -R $USER:$GROUP $NAVIDROME_DIR/bin
-
+#cd -
 # 创建配置文件
-mkdir -p $NAVIDROME_DIR/music-library
-mkdir -p $NAVIDROME_DIR/config
 echo "MusicFolder = \"$NAVIDROME_DIR/music-library\"" | sudo tee $NAVIDROME_DIR/config/navidrome.toml
 
 # 创建 Systemd 服务单元
