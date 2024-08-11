@@ -1,5 +1,5 @@
 #!/bin/bash
-#wget -O intial.sh https://gt.theucd.com/jwsky/scripts/main/intial.sh && sh intial.sh
+#wget -O initial.sh https://gt.theucd.com/jwsky/scripts/main/initial.sh && sh initial.sh
 echo "请选择您要安装的内容: "
 echo "1) 时间同步器"
 echo "2) Navidrome"
