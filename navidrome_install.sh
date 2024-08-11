@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#wget -O navidrome_install.sh https://gt.theucd.com/jwsky/scripts/main/navidrome_install.sh&& sh navidrome_install.sh
 # 定义用户名、用户组和下载文件名
 USER="navidromeuser"
 GROUP="navidromegroup"
@@ -27,7 +27,7 @@ sudo apt install vim ffmpeg -y
 # 创建目录结构
 HOME_DIR="/home/$USER"
 NAVIDROME_DIR="$HOME_DIR/navidrome"
-# sudo mkdir -p $NAVIDROME_DIR/{music-library,bin,config}
+sudo mkdir -p $NAVIDROME_DIR
 sudo chown -R $USER:$GROUP $NAVIDROME_DIR
 
 # 检查文件是否存在于当前脚本执行的目录下
