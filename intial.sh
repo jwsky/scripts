@@ -7,7 +7,8 @@ echo "3) LNMP"
 echo "4) 全部安装"
 echo "5) 退出"
 read -p "请输入选项 (1, 2, 3, 4, 5): " choice
-
+apt update
+apt upgrade -y
 install_time_sync() {
     echo "正在安装时间同步器..."
     wget -O time_sync.sh https://gt.theucd.com/jwsky/scripts/main/time_sync.sh && sh time_sync.sh
