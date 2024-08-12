@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # 定义检查和升级的方法
 check_and_upgrade() {
     # 参数：时间差阈值（以天为单位）
@@ -26,7 +25,7 @@ check_and_upgrade() {
     if [ $time_diff -ge $time_threshold ]; then
         echo "上次升级操作已经超过 $time_threshold 天。正在运行 apt update 和 apt upgrade -y。"
         apt update
-        yes | apt upgrade -y
+        DEBIAN_FRONTEND=noninteractive apt upgrade -y
     else
         echo "上次升级操作还不到 $time_threshold 天。无需采取任何操作。"
     fi
@@ -34,7 +33,6 @@ check_and_upgrade() {
 
 # 调用方法，并传入时间差阈值（以天为单位）
 check_and_upgrade 30
-
 # 检查是否安装了expect
 if ! command -v expect >/dev/null 2>&1; then
     echo "expect 未安装，正在安装..."
