@@ -30,7 +30,7 @@ check_and_upgrade() {
     if [ $time_diff -ge $time_threshold ]; then
         echo "上次升级操作已经超过 $time_threshold 天。正在运行 apt update 和 apt upgrade -y。"
         apt update
-        sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y
+        sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y --option=Dpkg::Options::="--force-confdef" --option=Dpkg::Options::="--force-confnew" --option=Dpkg::Options::="--force-yes"
     else
         echo "上次升级操作还不到 $time_threshold 天。无需采取任何操作。"
     fi
