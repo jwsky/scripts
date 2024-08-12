@@ -10,8 +10,25 @@ echo "-------其他工具安装"
 echo "6）更换ubuntu更新源"
 
 read -p "请输入选项 (1, 2, 3, 4, 5, 6): " choice
-apt update
-apt upgrade -y
+# 定义时间差阈值（以天为单位）
+time_threshold=30
+# 获取上次 apt upgrade 的时间
+last_upgrade_time=$(grep -i "upgrade" /var/log/dpkg.log | tail -n 1 | awk '{print $1" "$2}')
+# 将日志时间转换为时间戳
+last_upgrade_timestamp=$(date -d "$last_upgrade_time" +%s)
+current_timestamp=$(date +%s)
+# 计算时间差（以天为单位）
+time_diff=$(( (current_timestamp - last_upgrade_timestamp) / 86400 ))
+# 如果时间差大于或等于定义的阈值，则运行 apt update 和 apt upgrade -y
+if [ $time_diff -ge $time_threshold ]; then
+    echo "上次升级操作已经超过 $time_threshold 天。正在运行 apt update 和 apt upgrade -y。"
+    apt update
+    yes | apt upgrade -y
+else
+    echo "上次升级操作还不到 $time_threshold 天。无需采取任何操作。"
+fi
+
+
 install_time_sync() {
     echo "正在安装时间同步器..."
     wget -O time_sync.sh https://gt.theucd.com/jwsky/scripts/main/time_sync.sh && sh time_sync.sh
