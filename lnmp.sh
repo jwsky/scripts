@@ -14,12 +14,11 @@ rm -rf lnmp2.1
 rm -f lnmp.sh lnmp2.1.tar.gz
 
 # 检查是否安装 expect
-if ! command -v expect &> /dev/null
-then
+if command -v expect | grep -q 'expect'; then
+    echo "expect 已安装。"
+else
     echo "expect 未安装。正在安装 expect..."
     sudo apt-get update && sudo apt-get install -y expect
-else
-    echo "expect 已安装。"
 fi
 
 # 下载并解压LNMP
