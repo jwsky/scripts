@@ -2,9 +2,12 @@
 
 # 检查是否传入 MySQL 密码参数
 if [ -z "$1" ]; then
-    echo "MySQL 密码为作为第一个参数传入，将等会自动创建并在安装成功后告知。"
+    echo "MySQL 密码未作为第一个参数传入，正在自动生成密码..."
+    MYSQL_PASSWORD=$(head /dev/urandom | tr -dc a-z0-9 | head -c 18)
+    echo "已生成 MySQL 密码：$MYSQL_PASSWORD"
+else
+    MYSQL_PASSWORD=$1
 fi
-MYSQL_PASSWORD=$1
 
 
 # 删除 lnmp2.1 文件夹
