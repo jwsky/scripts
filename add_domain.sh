@@ -52,10 +52,16 @@ fi
 
 # 获取传递的域名参数
 domain=$1
+
+# 检测是否传递了域名参数，如果没有，则提示用户输入
 if [ -z "$domain" ]; then
-    echo "请提供域名参数。"
-    exit 1
+    read -p "请提供域名参数：" domain
+    if [ -z "$domain" ]; then
+        echo "未提供有效的域名参数，脚本退出。"
+        exit 1
+    fi
 fi
+
 
 # 检测域名解析是否返回有效IP
 domain_ip=$(ping -c 1 $domain | sed -nE 's/.*\(([^)]+)\).*/\1/p')
