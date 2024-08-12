@@ -1,9 +1,6 @@
 #!/bin/bash
 #wget -O add_disk.sh https://gt.theucd.com/jwsky/scripts/main/add_disk.sh && sh add_disk.sh
 
-
-#!/bin/bash
-
 # 检查 /dev/vdb1 是否已经格式化为 ext4
 if ! blkid /dev/vdb1 | grep -q "ext4"; then
     echo "/dev/vdb1 尚未格式化为 ext4 文件系统，正在格式化..."
