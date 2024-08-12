@@ -43,8 +43,7 @@ check_and_upgrade() {
     fi
 }
 
-# 调用方法，并传入时间差阈值（以天为单位）
-check_and_upgrade 30
+
 
 
 install_time_sync() {
@@ -69,15 +68,23 @@ install_change_source() {
 
 case $choice in
     1)
+        # 调用方法，并传入时间差阈值（以天为单位）
+        check_and_upgrade 30
         install_time_sync
         ;;
     2)
+        # 调用方法，并传入时间差阈值（以天为单位）
+        check_and_upgrade 30
         install_navidrome
         ;;
     3)
+        # 调用方法，并传入时间差阈值（以天为单位）
+        check_and_upgrade 30
         install_lnmp
         ;;
     4)
+        # 调用方法，并传入时间差阈值（以天为单位）
+        check_and_upgrade 30
         install_time_sync
         install_navidrome
         install_lnmp
