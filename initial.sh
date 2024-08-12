@@ -9,8 +9,10 @@ echo "5) 退出"
 echo "-------其他工具安装"
 echo "6）更换ubuntu更新源"
 echo "7）挂载新的数据盘到/home"
+echo "8）lnmp自动添加域名"
 
-read -p "请输入选项 (1, 2, 3, 4, 5, 6): " choice
+
+read -p "请输入选项 (1, 2, 3, 4, 5, 6, 7 ,8 ): " choice
 
 # 定义检查和升级的方法
 check_and_upgrade() {
@@ -70,6 +72,10 @@ add_disk() {
     wget -O add_disk.sh https://gt.theucd.com/jwsky/scripts/main/add_disk.sh && sh add_disk.sh
 }
 
+add_domain() {
+    echo "正在挂载数据盘到/home，请稍等..."
+    wget -O add_domain.sh https://gt.theucd.com/jwsky/scripts/main/add_domain.sh && sh add_domain.sh
+}
 
 case $choice in
     1)
@@ -104,7 +110,10 @@ case $choice in
     7)
         add_disk
         ;;
+    8)
+        add_domain
+        ;; 
     *)
-        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7"
+        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8"
         ;;
 esac
