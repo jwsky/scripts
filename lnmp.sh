@@ -2,10 +2,8 @@
 
 # 检查是否传入 MySQL 密码参数
 if [ -z "$1" ]; then
-    echo "请提供 MySQL 密码作为第一个参数。"
-    exit 1
+    echo "MySQL 密码为作为第一个参数传入，将等会自动创建并在安装成功后告知。"
 fi
-
 MYSQL_PASSWORD=$1
 
 
