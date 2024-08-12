@@ -27,7 +27,9 @@ fi
 # 强制同步时间
 echo "正在强制同步时间..."
 sudo chronyc makestep
-
+# 时区修改
+sudo timedatectl set-timezone Asia/Shanghai
+timedatectl
 # 检查同步状态
 echo "当前时间同步状态："
 chronyc tracking
