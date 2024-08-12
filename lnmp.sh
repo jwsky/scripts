@@ -16,12 +16,45 @@ rm -rf lnmp2.1
 # 删除 lnmp.sh 和 lnmp2.1.tar.gz 文件
 rm -f lnmp.sh lnmp2.1.tar.gz
 
+
+# 定义检查和升级的方法
+check_and_upgrade() {
+    # 参数：时间差阈值（以天为单位）
+    local time_threshold=$1
+
+    # 获取上次 apt upgrade 的时间
+    local last_upgrade_time=$(grep -i "upgrade" /var/log/dpkg.log | tail -n 1 | awk '{print $1" "$2}')
+
+    # 将日志时间转换为时间戳
+    local last_upgrade_timestamp=$(date -d "$last_upgrade_time" +%s)
+    local current_timestamp=$(date +%s)
+
+    # 计算时间差（以天为单位）
+    local time_diff=$(( (current_timestamp - last_upgrade_timestamp) / 86400 ))
+
+    # 如果时间差大于或等于定义的阈值，则运行 apt update 和 apt upgrade -y
+    if [ $time_diff -ge $time_threshold ]; then
+        echo "上次升级操作已经超过 $time_threshold 天。正在运行 apt update 和 apt upgrade -y。"
+        apt update
+        yes | apt upgrade -y
+    else
+        echo "上次升级操作还不到 $time_threshold 天。无需采取任何操作。"
+    fi
+}
+
+
+
+
+
+
 # 检查是否安装 expect
 if command -v expect | grep -q 'expect'; then
     echo "expect 已安装。"
 else
     echo "expect 未安装。正在安装 expect..."
-    sudo apt-get update && sudo apt-get install -y expect
+    # 调用方法，并传入时间差阈值（以天为单位）
+    check_and_upgrade 30
+    sudo apt-get install -y expect
 fi
 
 # 下载并解压LNMP
