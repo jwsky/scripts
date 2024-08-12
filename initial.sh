@@ -12,12 +12,19 @@ echo "6）更换ubuntu更新源"
 read -p "请输入选项 (1, 2, 3, 4, 5, 6): " choice
 
 # 定义检查和升级的方法
+# 定义检查和升级的方法
 check_and_upgrade() {
     # 参数：时间差阈值（以天为单位）
     local time_threshold=$1
 
     # 获取上次 apt upgrade 的时间
     local last_upgrade_time=$(grep -i "upgrade" /var/log/dpkg.log | tail -n 1 | awk '{print $1" "$2}')
+
+    # 如果未找到上次升级的时间，设置为一个非常早的时间（如 1970-01-01）
+    if [ -z "$last_upgrade_time" ]; then
+        echo "未找到上次升级的记录，假设系统从未升级过。"
+        last_upgrade_time="1970-01-01 00:00:00"
+    fi
 
     # 将日志时间转换为时间戳
     local last_upgrade_timestamp=$(date -d "$last_upgrade_time" +%s)
@@ -30,7 +37,7 @@ check_and_upgrade() {
     if [ $time_diff -ge $time_threshold ]; then
         echo "上次升级操作已经超过 $time_threshold 天。正在运行 apt update 和 apt upgrade -y。"
         apt update
-        sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y --option=Dpkg::Options::="--force-confdef" --option=Dpkg::Options::="--force-confnew" --option=Dpkg::Options::="--force-yes"
+        yes | apt upgrade -y
     else
         echo "上次升级操作还不到 $time_threshold 天。无需采取任何操作。"
     fi
@@ -38,7 +45,6 @@ check_and_upgrade() {
 
 # 调用方法，并传入时间差阈值（以天为单位）
 check_and_upgrade 30
-
 
 
 install_time_sync() {
