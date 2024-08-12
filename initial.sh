@@ -8,6 +8,7 @@ echo "4) 全部安装"
 echo "5) 退出"
 echo "-------其他工具安装"
 echo "6）更换ubuntu更新源"
+echo "7）挂载新的数据盘到/home"
 
 read -p "请输入选项 (1, 2, 3, 4, 5, 6): " choice
 
@@ -64,6 +65,12 @@ install_change_source() {
     wget -O change_source.sh https://gt.theucd.com/jwsky/scripts/main/change_source.sh && sh change_source.sh
 }
 
+add_disk() {
+    echo "正在挂载数据盘到/home，请稍等..."
+    wget -O add_disk.sh https://gt.theucd.com/jwsky/scripts/main/add_disk.sh && sh add_disk.sh
+}
+
+
 case $choice in
     1)
         # 调用方法，并传入时间差阈值（以天为单位）
@@ -94,7 +101,10 @@ case $choice in
     6)
         install_change_source
         ;;
+    7)
+        add_disk
+        ;;
     *)
-        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6"
+        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7"
         ;;
 esac
