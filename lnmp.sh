@@ -136,3 +136,4 @@ expect {
 
 expect eof
 EOF
+echo "已生成 MySQL 密码,请务必立刻登录系统修改：$MYSQL_PASSWORD"
