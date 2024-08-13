@@ -30,7 +30,7 @@ case $choice in
     mv -f CapsWriter-Offline-master capswriter
 
     # 5. 解压 models.zip 到 capswriter/目录下，如果已有文件则自动替换
-    unzip -o models.zip -d capswriter/
+    unzip -o models.zip -d capswriter/models/
 
     # 6. 修改 capswriter/config.py 中的服务端和客户端端口号以及是否保存录音文件的配置
     sed -i '/class ServerConfig/{n;n;s/port = '\''6016'\''/port = '\''6688'\''/}' capswriter/config.py
@@ -38,6 +38,7 @@ case $choice in
     sed -i 's/save_audio = True/save_audio = False/' capswriter/config.py
 
     # 7. 安装依赖，使用清华源
+    apt install python3-pip -y
     pip3 install -r requirements-server.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
     ;;
   2)
