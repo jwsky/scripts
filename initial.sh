@@ -10,9 +10,11 @@ echo "-------其他工具安装"
 echo "6）更换ubuntu更新源"
 echo "7）挂载新的数据盘到/home"
 echo "8）lnmp自动添加域名"
+echo "9）安装或运行Capswriter"
 
 
-read -p "请输入选项 (1, 2, 3, 4, 5, 6, 7 ,8 ): " choice
+
+read -p "请输入选项 (1, 2, 3, 4, 5, 6, 7 ,8 , 9 ): " choice
 
 # 定义检查和升级的方法
 check_and_upgrade() {
@@ -77,6 +79,11 @@ add_domain() {
     wget -O add_domain.sh https://gt.theucd.com/jwsky/scripts/main/add_domain.sh && sh add_domain.sh
 }
 
+caps() {
+    echo "正在挂载数据盘到/home，请稍等..."
+    wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && sh caps.sh
+}
+
 case $choice in
     1)
         # 调用方法，并传入时间差阈值（以天为单位）
@@ -112,6 +119,9 @@ case $choice in
         ;;
     8)
         add_domain
+        ;; 
+    9)
+        caps
         ;; 
     *)
         echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8"
