@@ -138,7 +138,6 @@ echo "虚拟主机添加完成。"
 # 询问是否设置反向代理
 # 定义Nginx配置文件目录和域名
 nginx_config_dir="/usr/local/nginx/conf/vhost"
-domain=$1
 nginx_config_file="${nginx_config_dir}/${domain}.conf"
 
 echo "配置文件路径：$nginx_config_file"
