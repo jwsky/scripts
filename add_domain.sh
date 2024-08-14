@@ -12,8 +12,8 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# 检查是否已安装rinetd，通过判断返回结果中是否包含 'inetd' 字符串
-if ! command -v rinetd | grep -q "inetd"; then
+# 检查是否已安装rinetd，通过判断返回结果中是否包含 'rinetd' 字符串
+if ! command -v rinetd | grep -q "rinetd"; then
   echo "rinetd未安装，现在安装rinetd..."
   sudo apt update
   sudo apt install -y rinetd
@@ -28,7 +28,7 @@ wget -O "$config_file" "$config_url"
 
 # 提示输入解密密码，并明确等待用户输入
 echo
-read -sp "请输入解密密码: " decrypt_password
+read -p "请输入解密密码: " -s decrypt_password
 echo
 
 # 解密并替换/etc/rinetd.conf
