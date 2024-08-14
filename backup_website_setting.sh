@@ -6,7 +6,7 @@ echo "1) 上传 Rclone 配置文件"
 echo "2) 安装 Rclone，并设置自动备份"
 read -p "请输入选项 (1 或 2): " choice
 
-if [ "$choice" == "1" ]; then
+if [ "$choice" = "1" ]; then
     # 上传 Rclone 配置文件
     read -sp "请输入加密密码: " encrypt_password
     echo
@@ -41,7 +41,7 @@ if [ "$choice" == "1" ]; then
 
     exit 0
 
-elif [ "$choice" == "2" ]; then
+elif [ "$choice" = "2" ]; then
     # 安装 Rclone 并设置自动备份
 
     echo "正在检查并安装 crontab..."
