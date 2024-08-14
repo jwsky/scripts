@@ -100,14 +100,17 @@ elif [ "$choice" == "2" ]; then
 
     # 设置 Rclone 挂载为开机启动
     echo "正在设置 Rclone 挂载为开机启动..."
-    echo "@reboot root rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
-
+    
+    # 将挂载命令添加到 root 用户的 crontab 中
+    (crontab -l 2>/dev/null; echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full") | sudo crontab -
+    
     if [ $? -eq 0 ]; then
         echo "Rclone 挂载已设置为开机启动。"
     else
-        echo "Rclone 挂载设置失败，请检查 /etc/crontab 文件。"
+        echo "Rclone 挂载设置失败，请检查 crontab 文件。"
         exit 1
     fi
+
 
     # 下载备份脚本
     echo "正在下载备份脚本..."
