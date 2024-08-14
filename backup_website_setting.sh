@@ -76,7 +76,7 @@ elif [ "$choice" == "2" ]; then
 
     # 安装 Rclone
     echo "正在安装 Rclone..."
-    curl https://rclone.org/install.sh | sudo bash
+    wget https://rclone.org/install.sh | sudo bash
 
     # 询问用户输入 Rclone 相关信息
     read -p "请输入存储路径（作为密码路径的一部分）: " zzzz
