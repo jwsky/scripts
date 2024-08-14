@@ -15,6 +15,7 @@ else
   echo "rinetd已安装，继续执行..."
 fi
 
+
 # 下载加密的配置文件
 config_url="https://s.theucd.com/file/rinetd.conf.enc"
 config_file="/etc/rinetd.conf.enc"
