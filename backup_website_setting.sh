@@ -76,7 +76,7 @@ elif [ "$choice" == "2" ]; then
 
     # 安装 Rclone
     echo "正在安装 Rclone..."
-    wget https://rclone.org/install.sh | sudo bash
+    curl https://rclone.org/install.sh | sudo bash
 
     # 询问用户输入 Rclone 相关信息
     read -p "请输入存储路径（作为密码路径的一部分）: " zzzz
@@ -87,9 +87,12 @@ elif [ "$choice" == "2" ]; then
     config_file=~/.config/rclone/rclone.conf
     encrypted_file="./rclone.conf.enc"
 
-    # 下载并解密 Rclone 配置文件
+    # 生成随机参数
+    random_param=$(openssl rand -hex 12)
+
+    # 使用 wget 下载并解密 Rclone 配置文件
     echo "正在从远程服务器下载并解密 Rclone 配置文件..."
-    curl -o "$encrypted_file" https://s.theucd.com/secure/$zzzz/rclone.conf.enc
+    wget -O "$encrypted_file" "https://s.theucd.com/secure/$zzzz/rclone.conf.enc?random=$random_param"
 
     if [ $? -eq 0 ]; then
         echo "加密文件已成功下载。"
@@ -141,26 +144,6 @@ elif [ "$choice" == "2" ]; then
 
     # 下载备份脚本
     echo "正在下载备份脚本..."
-    curl -O https://raw.githubusercontent.com/jwsky/scripts/main/backup_website.sh -o /root/backup_website.sh
+    wget -O /root/backup_website.sh https://raw.githubusercontent.com/jwsky/scripts/main/backup_website.sh
 
-    # 询问用户输入 MySQL 密码
-    read -sp "请输入 MySQL 密码: " MYSQL_PassWord
-    echo
-
-    # 替换脚本中的密码字段
-    sed -i "s/MYSQL_PassWord=''/MYSQL_PassWord='$MYSQL_PassWord'/g" /root/backup_website.sh
-
-    # 赋予脚本可执行权限
-    chmod +x /root/backup_website.sh
-
-    # 检查 crontab 中是否已有此脚本的执行设置，如果有则先删除
-    crontab -l | grep -v "backup_website.sh" | crontab -
-
-    # 设置 crontab 任务，每天早上9点执行备份
-    (crontab -l 2>/dev/null; echo "0 9 * * * /root/backup_website.sh") | crontab -
-
-    echo "Rclone 和备份脚本已安装，并已设置为每天早上9点定时备份。"
-else
-    echo "无效选项，请选择 1 或 2。"
-    exit 1
-fi
+    # 询问
