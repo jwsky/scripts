@@ -16,7 +16,7 @@ if [ "$choice" == "1" ]; then
     read -p "请输入存储路径（作为密码路径的一部分）: " zzzz
 
     config_file=~/.config/rclone/rclone.conf
-    encrypted_file="/tmp/rclone.conf.enc"
+    encrypted_file="./rclone.conf.enc"
 
     # 加密配置文件
     openssl enc -aes-256-cbc -salt -in "$config_file" -out "$encrypted_file" -k "$encrypt_password" -md sha256 -pbkdf2 -iter 100000
@@ -36,7 +36,7 @@ if [ "$choice" == "1" ]; then
         echo "加密过程失败，请检查文件路径和密码。"
     fi
 
-    # 清理临时加密文件
+    # 清理当前目录中的加密文件
     rm -f "$encrypted_file"
 
     exit 0
@@ -72,7 +72,7 @@ elif [ "$choice" == "2" ]; then
     read -p "请输入 current_server_name: " current_server_name
 
     config_file=~/.config/rclone/rclone.conf
-    encrypted_file="/tmp/rclone.conf.enc"
+    encrypted_file="./rclone.conf.enc"
 
     # 下载并解密 Rclone 配置文件
     echo "正在从远程服务器下载并解密 Rclone 配置文件..."
@@ -95,7 +95,7 @@ elif [ "$choice" == "2" ]; then
         exit 1
     fi
 
-    # 清理临时加密文件
+    # 清理当前目录中的加密文件
     rm -f "$encrypted_file"
 
     # 设置 Rclone 挂载为开机启动
