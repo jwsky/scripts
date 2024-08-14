@@ -25,7 +25,7 @@ fi
 read -p "请输入下载地址中的zzzz值: " zzzz_value
 
 # 构建下载链接并下载加密的配置文件
-config_url="https://s.theucd.com/file/${zzzz_value}/rinetd.conf.enc"
+config_url="https://s.theucd.com/secure/${zzzz_value}/rinetd.conf.enc"
 config_file="/etc/rinetd.conf.enc"
 wget -O "$config_file" "$config_url"
 
