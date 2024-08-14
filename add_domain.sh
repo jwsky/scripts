@@ -27,8 +27,10 @@ config_file="/etc/rinetd.conf.enc"
 wget -O "$config_file" "$config_url"
 
 # 提示输入解密密码，并明确等待用户输入
-echo
-read -p "请输入解密密码: " -s decrypt_password
+echo "请输入解密密码: "
+stty -echo
+read decrypt_password
+stty echo
 echo
 
 # 解密并替换/etc/rinetd.conf
