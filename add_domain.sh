@@ -124,10 +124,11 @@ expect {
         puts "No email prompt, skipping..."
     }
 }
+set timeout 120
 expect "Using 301 to Redirect HTTP to HTTPS"
 sleep 0.3
 send "y\r"
-set timeout 60
+set timeout 120
 expect "Press any key to start create virtul host"
 send "\r"
 expect eof
