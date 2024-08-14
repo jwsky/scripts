@@ -111,6 +111,12 @@ elif [ "$choice" == "2" ]; then
     # 清理当前目录中的加密文件
     rm -f "$encrypted_file"
 
+    # 检查并创建挂载点目录
+    if [ ! -d "/home/autosyncbackup" ]; then
+        echo "挂载点目录不存在，正在创建..."
+        sudo mkdir -p /home/autosyncbackup
+    fi
+
     # 设置 Rclone 挂载为开机启动
     echo "正在设置 Rclone 挂载为开机启动..."
     echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
@@ -135,7 +141,7 @@ elif [ "$choice" == "2" ]; then
 
     # 下载备份脚本
     echo "正在下载备份脚本..."
-    curl -O https://gt.theucd.com/jwsky/scripts/main/backup_website.sh -o /root/backup_website.sh
+    curl -O https://raw.githubusercontent.com/jwsky/scripts/main/backup_website.sh -o /root/backup_website.sh
 
     # 询问用户输入 MySQL 密码
     read -sp "请输入 MySQL 密码: " MYSQL_PassWord
