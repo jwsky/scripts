@@ -43,6 +43,7 @@ if [ "$choice" == "1" ]; then
 
 elif [ "$choice" == "2" ]; then
     # 安装 Rclone 并设置自动备份
+
     echo "正在检查并安装 crontab..."
     if ! command -v crontab | grep -q "crontab"; then
         echo "crontab 未安装，正在安装..."
@@ -59,6 +60,18 @@ elif [ "$choice" == "2" ]; then
         fi
     else
         echo "crontab 已安装。"
+    fi
+
+    # 安装 FUSE3
+    echo "正在安装 FUSE3..."
+    if [ -f /etc/debian_version ]; then
+        sudo apt-get update
+        sudo apt-get install -y fuse3
+    elif [ -f /etc/redhat-release ]; then
+        sudo yum install -y fuse3
+    else
+        echo "无法确定操作系统，无法自动安装 FUSE3，请手动安装。"
+        exit 1
     fi
 
     # 安装 Rclone
@@ -100,17 +113,25 @@ elif [ "$choice" == "2" ]; then
 
     # 设置 Rclone 挂载为开机启动
     echo "正在设置 Rclone 挂载为开机启动..."
-    
-    # 将挂载命令添加到 root 用户的 crontab 中
-    (crontab -l 2>/dev/null; echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full") | sudo crontab -
-    
+    echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
+
     if [ $? -eq 0 ]; then
         echo "Rclone 挂载已设置为开机启动。"
+
+        # 立即执行挂载命令
+        echo "正在立即挂载 Rclone..."
+        rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --vfs-cache-mode full -vv
+
+        if [ $? -eq 0 ]; then
+            echo "Rclone 已成功挂载。"
+        else
+            echo "Rclone 挂载失败，请检查命令。"
+            exit 1
+        fi
     else
         echo "Rclone 挂载设置失败，请检查 crontab 文件。"
         exit 1
     fi
-
 
     # 下载备份脚本
     echo "正在下载备份脚本..."
