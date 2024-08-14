@@ -121,7 +121,7 @@ expect {
         send "$random_email\r"
     }
     timeout {
-        puts "No email prompt, skipping..."
+     #   puts "No email prompt, skipping..."
     }
 }
 set timeout 120
