@@ -6,8 +6,8 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# 检查是否已安装rinetd
-if ! command -v rinetd &> /dev/null; then
+# 检查是否已安装rinetd，通过判断返回结果中是否包含 'inetd' 字符串
+if ! command -v rinetd | grep -q "inetd"; then
   echo "rinetd未安装，现在安装rinetd..."
   sudo apt update
   sudo apt install -y rinetd
@@ -18,11 +18,12 @@ fi
 # 下载加密的配置文件
 config_url="https://s.theucd.com/file/rinetd.conf.enc"
 config_file="/etc/rinetd.conf.enc"
-curl -o "$config_file" "$config_url"
+wget -O "$config_file" "$config_url"
 
-# 提示输入解密密码
-read -sp "请输入解密密码: " decrypt_password
+# 提示输入解密密码，并明确等待用户输入
 echo
+echo "请输入解密密码: "
+read -s decrypt_password
 
 # 解密并替换/etc/rinetd.conf
 openssl enc -d -aes-256-cbc -in "$config_file" -out /etc/rinetd.conf -k "$decrypt_password" -md sha256 -pbkdf2 -iter 100000
