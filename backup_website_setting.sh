@@ -159,7 +159,7 @@ elif [ "$choice" = "2" ]; then
 
     # 下载备份脚本
     echo "正在下载备份脚本..."
-    curl -O https://gt.theucd.com/jwsky/scripts/main/backup_website.sh -o /root/backup_website.sh
+    wget -O backup_website.sh https://gt.theucd.com/jwsky/scripts/main/backup_website.sh
 
     # 询问用户输入 MySQL 密码
     read -sp "请输入 MySQL 密码: " MYSQL_PassWord
