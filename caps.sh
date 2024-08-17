@@ -40,7 +40,7 @@ case $choice in
 
     # 7. 安装依赖，使用清华源
     apt install python3-pip -y
-    pip3 install -r requirements-server.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+    pip3 install -r capswriter/requirements-server.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
     ;;
   2)
     # 仅运行服务器
