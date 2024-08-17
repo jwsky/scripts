@@ -24,6 +24,7 @@ case $choice in
     wget -O models.zip https://s.theucd.com/file/models.zip
 
     # 3. 解压 capswriter.zip
+    apt install unzip -y
     unzip -o capswriter.zip
 
     # 4. 重命名文件夹 CapsWriter-Offline-master 为 capswriter
