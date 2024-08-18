@@ -8,23 +8,17 @@ for name in "${disks[@]}"; do
     # 获取硬盘的总大小
     total_size=$(lsblk -dn -o SIZE /dev/$name | head -n 1)
     disk_info+=("Total: $total_size")
-done
-
-echo "可用的硬盘设备列表:"
-for i in "${!disks[@]}"; do
-    echo "$((i+1)). ${disks[$i]} (${disk_info[$i]})"
+    echo "$name ($total_size)"
 done
 
 # 选择硬盘设备
-read -p "请选择一个硬盘设备编号（如：1）： " disk_index
+read -p "请输入要操作的硬盘名称（如：sdb）： " selected_disk
 
 # 验证选择是否有效
-if [ -z "$disk_index" ] || ! [[ "$disk_index" =~ ^[0-9]+$ ]] || [ "$disk_index" -le 0 ] || [ "$disk_index" -gt "${#disks[@]}" ]; then
+if [[ ! " ${disks[@]} " =~ " ${selected_disk} " ]]; then
     echo "无效的选择，脚本终止。"
     exit 1
 fi
-
-selected_disk=${disks[$((disk_index-1))]}
 
 # 创建挂载点
 mount_point="/mnt/$selected_disk"
