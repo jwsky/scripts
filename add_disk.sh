@@ -31,10 +31,18 @@ mount_point="/mnt/$selected_disk"
 mkdir -p $mount_point
 
 # 检查 /dev/$selected_disk 是否已经格式化为 ext4
-if ! blkid /dev/${selected_disk} | grep -q "ext4"; then
-    echo "/dev/${selected_disk} 尚未格式化为 ext4 文件系统。"
-    read -p "你确定要格式化这个硬盘吗? 这将会删除所有数据。 (yes/no): " confirm
-    if [[ "$confirm" == "yes" ]]; then
+fs_type=$(blkid -o value -s TYPE /dev/${selected_disk})
+
+if [ "$fs_type" == "ext4" ]; then
+    echo "/dev/${selected_disk} 已经格式化为 ext4 文件系统。"
+    read -p "是否要强制重新格式化这个硬盘？输入 'format' 来确认，输入 'n' 取消操作: " confirm
+    if [[ "$confirm" == "format" ]]; then
+        echo "正在卸载 /dev/${selected_disk}..."
+        umount /dev/${selected_disk}
+        if [ $? -ne 0 ]; then
+            echo "卸载失败，请检查磁盘是否被使用。"
+            exit 1
+        fi
         echo "正在格式化 /dev/${selected_disk}..."
         mkfs.ext4 /dev/${selected_disk}
         if [ $? -ne 0 ]; then
@@ -42,19 +50,36 @@ if ! blkid /dev/${selected_disk} | grep -q "ext4"; then
             exit 1
         fi
         echo "格式化完成。"
+    elif [[ "$confirm" == "n" ]]; then
+        echo "取消格式化操作。"
     else
-        echo "格式化取消。"
-        exit 0
+        echo "无效输入。操作已取消。"
+        exit 1
+    fi
+elif [ -z "$fs_type" ]; then
+    read -p "你确定要格式化这个硬盘为 ext4 吗? 输入 'format' 来确认，输入 'n' 取消操作: " confirm
+    if [[ "$confirm" == "format" ]]; then
+        echo "正在卸载 /dev/${selected_disk}..."
+        umount /dev/${selected_disk}
+        if [ $? -ne 0 ]; then
+            echo "卸载失败，请检查磁盘是否被使用。"
+            exit 1
+        fi
+        echo "正在格式化 /dev/${selected_disk}..."
+        mkfs.ext4 /dev/${selected_disk}
+        if [ $? -ne 0 ]; then
+            echo "格式化失败，请检查 /dev/${selected_disk} 分区是否正确。"
+            exit 1
+        fi
+        echo "格式化完成。"
+    elif [[ "$confirm" == "n" ]]; then
+        echo "取消格式化操作。"
+    else
+        echo "无效输入。操作已取消。"
+        exit 1
     fi
 else
-    echo "/dev/${selected_disk} 已经格式化为 ext4 文件系统。"
-fi
-
-# 挂载 /dev/$selected_disk 到挂载点
-mount /dev/${selected_disk} $mount_point
-if [ $? -ne 0 ]; then
-    echo "无法挂载 /dev/${selected_disk} 到 $mount_point，请检查文件系统类型或设备。"
-    exit 1
+    echo "硬盘 /dev/${selected_disk} 当前格式为 $fs_type."
 fi
 
 # 确保需要挂载的文件夹存在
@@ -65,25 +90,10 @@ folders=(
 )
 
 for folder in "${folders[@]}"; do
-    # 检查文件夹是否已被挂载
-    if mountpoint -q "$folder"; then
-        echo "警告: $folder 已经被挂载。"
-        continue
-    fi
-
-    # 检查文件夹是否存在，并备份
-    if [ -d "$folder" ]; then
-        echo "文件夹 $folder 已存在，正在备份..."
-        backup_folder="$mount_point$(basename $folder)_backup"
-        mkdir -p "$backup_folder"
-        rsync -a "$folder/" "$backup_folder/"
-        echo "备份完成。"
-    fi
-
-    # 创建相应的挂载点目录
     target_mount_point="$mount_point$(basename $folder)"
-    mkdir -p $target_mount_point
-    
+    mkdir -p $folder  # 确保挂载目标文件夹存在
+    mkdir -p $target_mount_point  # 确保挂载源文件夹存在
+
     # 挂载文件夹到硬盘
     if ! mount --bind $target_mount_point $folder; then
         echo "挂载 $target_mount_point 到 $folder 失败，请检查。"
@@ -96,7 +106,7 @@ done
 # 编辑 /etc/fstab 文件以确保分区和文件夹自动挂载
 echo "/dev/${selected_disk}  $mount_point  ext4  defaults  0  2" >> /etc/fstab
 for folder in "${folders[@]}"; do
-    echo "$mount_point$(basename $folder)  $folder  none  bind  0  0" >> /etc/fstab
+    echo "$target_mount_point  $folder  none  bind  0  0" >> /etc/fstab
 done
 
 # 验证挂载是否成功
