@@ -6,12 +6,16 @@ disk_info=()
 
 for name in "${disks[@]}"; do
     size=$(lsblk -dn -o SIZE /dev/$name)
-    used_space=$(df -BG --output=used /dev/$name | tail -1 | tr -d ' ')
-    avail_space=$(df -BG --output=avail /dev/$name | tail -1 | tr -d ' ')
+    mount_point=$(lsblk -dn -o MOUNTPOINT /dev/$name)
     
-    if [ -z "$used_space" ]; then
+    if [ -z "$mount_point" ]; then
+        # 如果硬盘未挂载，则假设没有已用空间，并使用总空间作为可用空间
         used_space="0G"
         avail_space="$size"
+    else
+        # 如果硬盘已挂载，则使用 df 获取已用空间和可用空间
+        used_space=$(df -BG --output=used /dev/$name | tail -1 | tr -d ' ')
+        avail_space=$(df -BG --output=avail /dev/$name | tail -1 | tr -d ' ')
     fi
     
     disk_info+=("Total: $size, Used: $used_space, Avail: $avail_space")
@@ -26,7 +30,7 @@ done
 read -p "请选择一个硬盘设备编号（如：1）： " disk_index
 
 # 验证选择是否有效
-if [ -z "$disk_index" ] || ! [[ "$disk_index" =~ ^[0-9]+$ ]] || [ "$disk_index" -le 0 ] || [ "$disk_index" -gt "${#disks[@]}" ]; then
+if [ -z "$disk_index" ] || ! [[ "$disk_index" =~ ^[0-9]+$ ]] || [ "$disk_index" -le 0 ] || [ "$disk_index" -gt "${#disks[@]}" ];then
     echo "无效的选择，脚本终止。"
     exit 1
 fi
@@ -60,7 +64,7 @@ fi
 # 确保需要挂载的文件夹存在
 folders=(
     "/home/navidromeuser/navidrome/music-library"
-    "/home/backupfile"
+    "/home/autosyncbackup"
     "/home/wwwroot/storage.memo.ink"
 )
 
