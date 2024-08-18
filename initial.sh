@@ -51,37 +51,37 @@ check_and_upgrade() {
 
 install_time_sync() {
     echo "正在安装时间同步器..."
-    wget -O time_sync.sh https://gt.theucd.com/jwsky/scripts/main/time_sync.sh && sh time_sync.sh
+    wget -O time_sync.sh https://gt.theucd.com/jwsky/scripts/main/time_sync.sh && bash time_sync.sh
 }
 
 install_navidrome() {
     echo "正在安装Navidrome..."
-    wget -O navidrome_install.sh https://gt.theucd.com/jwsky/scripts/main/navidrome_install.sh && sh navidrome_install.sh
+    wget -O navidrome_install.sh https://gt.theucd.com/jwsky/scripts/main/navidrome_install.sh && bash navidrome_install.sh
 }
 
 install_lnmp() {
     echo "正在安装LNMP..."
-    wget -O lnmp.sh https://gt.theucd.com/jwsky/scripts/main/lnmp.sh && sh lnmp.sh
+    wget -O lnmp.sh https://gt.theucd.com/jwsky/scripts/main/lnmp.sh && bash lnmp.sh
 }
 
 install_change_source() {
     echo "正在更换源，请记得选择源的内容..."
-    wget -O change_source.sh https://gt.theucd.com/jwsky/scripts/main/change_source.sh && sh change_source.sh
+    wget -O change_source.sh https://gt.theucd.com/jwsky/scripts/main/change_source.sh && bash change_source.sh
 }
 
 add_disk() {
     echo "正在挂载数据盘到/home，请稍等..."
-    wget -O add_disk.sh https://gt.theucd.com/jwsky/scripts/main/add_disk.sh && sh add_disk.sh
+    wget -O add_disk.sh https://gt.theucd.com/jwsky/scripts/main/add_disk.sh && bash add_disk.sh
 }
 
 add_domain() {
     echo "正在挂载数据盘到/home，请稍等..."
-    wget -O add_domain.sh https://gt.theucd.com/jwsky/scripts/main/add_domain.sh && sh add_domain.sh
+    wget -O add_domain.sh https://gt.theucd.com/jwsky/scripts/main/add_domain.sh && bash add_domain.sh
 }
 
 caps() {
     echo "正在挂载数据盘到/home，请稍等..."
-    wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && sh caps.sh
+    wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && bash caps.sh
 }
 
 case $choice in
