@@ -8,7 +8,7 @@ echo "4) 全部安装"
 echo "5) 退出"
 echo "-------其他工具安装"
 echo "6）更换ubuntu更新源"
-echo "7）挂载新的数据盘到/home"
+echo "7）挂载数据盘，并把文件夹挂载上去"
 echo "8）lnmp自动添加域名"
 echo "9）安装或运行Capswriter"
 
