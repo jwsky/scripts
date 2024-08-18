@@ -1,70 +1,94 @@
 #!/bin/bash
-#wget -O add_disk.sh https://gt.theucd.com/jwsky/scripts/main/add_disk.sh && sh add_disk.sh
 
-# 检查 /dev/vdb1 是否已经格式化为 ext4
-if ! blkid /dev/vdb1 | grep -q "ext4"; then
-    echo "/dev/vdb1 尚未格式化为 ext4 文件系统，正在格式化..."
-    mkfs.ext4 /dev/vdb1
+# 查询可用的硬盘设备并显示总空间、使用空间和剩余空间
+available_disks=$(lsblk -dn --output NAME,SIZE | grep -v "loop" | while read -r name size; do
+    mount_point=$(df -h | grep "^/dev/${name}" | awk '{print $6}')
+    used_space=$(df -BG | grep "^/dev/${name}" | awk '{print $3}')
+    avail_space=$(df -BG | grep "^/dev/${name}" | awk '{print $4}')
+    if [ -z "$mount_point" ]; then
+        used_space="0G"
+        avail_space="$size"
+    fi
+    printf "%-8s Total: %-6s Used: %-6s Avail: %-6s\n" "$name" "$size" "$used_space" "$avail_space"
+done)
+
+echo "可用的硬盘设备列表:"
+echo "$available_disks"
+
+# 选择硬盘设备
+read -p "请选择一个硬盘设备（如：vdb）： " selected_disk
+
+# 确认选择
+if [ -z "$selected_disk" ]; then
+    echo "未选择任何硬盘，脚本终止。"
+    exit 1
+fi
+
+# 创建挂载点
+mount_point="/mnt/$selected_disk"
+mkdir -p $mount_point
+
+# 检查 /dev/$selected_disk1 是否已经格式化为 ext4
+if ! blkid /dev/${selected_disk}1 | grep -q "ext4"; then
+    echo "/dev/${selected_disk}1 尚未格式化为 ext4 文件系统，正在格式化..."
+    mkfs.ext4 /dev/${selected_disk}1
     if [ $? -ne 0 ]; then
-        echo "格式化失败，请检查 /dev/vdb1 分区是否正确。"
+        echo "格式化失败，请检查 /dev/${selected_disk}1 分区是否正确。"
         exit 1
     fi
     echo "格式化完成。"
 else
-    echo "/dev/vdb1 已经格式化为 ext4 文件系统。"
+    echo "/dev/${selected_disk}1 已经格式化为 ext4 文件系统。"
 fi
 
-# 创建挂载点
-mkdir -p /mnt/temp_home
-
-# 挂载 /dev/vdb1 到临时挂载点
-mount /dev/vdb1 /mnt/temp_home
+# 挂载 /dev/$selected_disk1 到挂载点
+mount /dev/${selected_disk}1 $mount_point
 if [ $? -ne 0 ]; then
-    echo "无法挂载 /dev/vdb1 到 /mnt/temp_home，请检查文件系统类型或设备。"
+    echo "无法挂载 /dev/${selected_disk}1 到 $mount_point，请检查文件系统类型或设备。"
     exit 1
 fi
 
-# 备份现有的 /home 数据到新的挂载点
-rsync -a /home/ /mnt/temp_home/
+# 确保需要挂载的文件夹存在
+folders=(
+    "/home/navidromeuser/navidrome/music-library"
+    "/home/autosyncbackup"
+    "/home/wwwroot/storage.memo.ink"
+)
 
-# 检查备份是否成功
-if [ "$(ls -A /mnt/temp_home)" ]; then
-    echo "备份成功，开始挂载新分区到 /home"
-else
-    echo "备份失败，脚本终止"
-    exit 1
-fi
+for folder in "${folders[@]}"; do
+    if [ ! -d "$folder" ]; then
+        echo "文件夹 $folder 不存在，正在创建..."
+        mkdir -p $folder
+    fi
+    
+    # 创建相应的挂载点目录
+    target_mount_point="$mount_point$(basename $folder)"
+    mkdir -p $target_mount_point
+    
+    # 挂载文件夹到硬盘
+    if ! mount --bind $target_mount_point $folder; then
+        echo "挂载 $target_mount_point 到 $folder 失败，请检查。"
+        exit 1
+    else
+        echo "$folder 已成功挂载到 $target_mount_point"
+    fi
+done
 
-# 卸载新分区
-umount /mnt/temp_home
-
-# 挂载 /dev/vdb1 到 /home
-mount /dev/vdb1 /home
-if [ $? -ne 0 ]; then
-    echo "无法挂载 /dev/vdb1 到 /home，请检查文件系统类型或设备。"
-    exit 1
-fi
-
-# 编辑 /etc/fstab 文件以确保分区自动挂载
-echo "/dev/vdb1  /home  ext4  defaults  0  2" >> /etc/fstab
+# 编辑 /etc/fstab 文件以确保分区和文件夹自动挂载
+echo "/dev/${selected_disk}1  $mount_point  ext4  defaults  0  2" >> /etc/fstab
+for folder in "${folders[@]}"; do
+    echo "$mount_point$(basename $folder)  $folder  none  bind  0  0" >> /etc/fstab
+done
 
 # 验证挂载是否成功
 mount -a
-if df -h | grep -q '/home'; then
-    echo "/dev/vdb1 成功挂载到 /home"
-else
-    echo "挂载失败，请手动检查"
-    exit 1
-fi
-
-# 清理旧的 /home 数据（谨慎操作）
-read -p "是否删除旧的 /home 数据？这将无法恢复 [y/N]: " confirm
-if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
-    rm -rf /old_home/*
-    echo "旧的 /home 数据已删除"
-else
-    echo "保留旧的 /home 数据"
-fi
+for folder in "${folders[@]}"; do
+    if mount | grep -q "$folder"; then
+        echo "$folder 挂载成功"
+    else
+        echo "$folder 挂载失败，请手动检查"
+        exit 1
+    fi
+done
 
 echo "脚本执行完毕"
-
