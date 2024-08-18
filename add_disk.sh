@@ -1,22 +1,13 @@
 #!/bin/bash
 
-# 查询可用的硬盘设备并显示总空间、已用空间和可用空间
+# 查询可用的硬盘设备并显示总空间
 disks=($(lsblk -dn --output NAME | grep -v "loop"))
 disk_info=()
 
 for name in "${disks[@]}"; do
-    size=$(lsblk -dn -o SIZE /dev/$name)
-    mountpoint=$(lsblk -dn -o MOUNTPOINT /dev/$name)
-    
-    if [ -n "$mountpoint" ]; then
-        used_space=$(df -BG --output=used /dev/$name | tail -1 | tr -d ' ')
-        avail_space=$(df -BG --output=avail /dev/$name | tail -1 | tr -d ' ')
-    else
-        used_space="N/A"
-        avail_space="N/A"
-    fi
-    
-    disk_info+=("Total: $size, Used: $used_space, Avail: $avail_space")
+    # 获取硬盘的总大小
+    total_size=$(lsblk -dn -o SIZE /dev/$name | head -n 1)
+    disk_info+=("Total: $total_size")
 done
 
 echo "可用的硬盘设备列表:"
@@ -41,13 +32,20 @@ mkdir -p $mount_point
 
 # 检查 /dev/$selected_disk 是否已经格式化为 ext4
 if ! blkid /dev/${selected_disk} | grep -q "ext4"; then
-    echo "/dev/${selected_disk} 尚未格式化为 ext4 文件系统，正在格式化..."
-    mkfs.ext4 /dev/${selected_disk}
-    if [ $? -ne 0 ]; then
-        echo "格式化失败，请检查 /dev/${selected_disk} 分区是否正确。"
-        exit 1
+    echo "/dev/${selected_disk} 尚未格式化为 ext4 文件系统。"
+    read -p "你确定要格式化这个硬盘吗? 这将会删除所有数据。 (yes/no): " confirm
+    if [[ "$confirm" == "yes" ]]; then
+        echo "正在格式化 /dev/${selected_disk}..."
+        mkfs.ext4 /dev/${selected_disk}
+        if [ $? -ne 0 ]; then
+            echo "格式化失败，请检查 /dev/${selected_disk} 分区是否正确。"
+            exit 1
+        fi
+        echo "格式化完成。"
+    else
+        echo "格式化取消。"
+        exit 0
     fi
-    echo "格式化完成。"
 else
     echo "/dev/${selected_disk} 已经格式化为 ext4 文件系统。"
 fi
@@ -62,16 +60,26 @@ fi
 # 确保需要挂载的文件夹存在
 folders=(
     "/home/navidromeuser/navidrome/music-library"
-    "/home/autosyncbackup"
+    "/home/backupfile"
     "/home/wwwroot/storage.memo.ink"
 )
 
 for folder in "${folders[@]}"; do
-    if [ ! -d "$folder" ]; then
-        echo "文件夹 $folder 不存在，正在创建..."
-        mkdir -p $folder
+    # 检查文件夹是否已被挂载
+    if mountpoint -q "$folder"; then
+        echo "警告: $folder 已经被挂载。"
+        continue
     fi
-    
+
+    # 检查文件夹是否存在，并备份
+    if [ -d "$folder" ]; then
+        echo "文件夹 $folder 已存在，正在备份..."
+        backup_folder="$mount_point$(basename $folder)_backup"
+        mkdir -p "$backup_folder"
+        rsync -a "$folder/" "$backup_folder/"
+        echo "备份完成。"
+    fi
+
     # 创建相应的挂载点目录
     target_mount_point="$mount_point$(basename $folder)"
     mkdir -p $target_mount_point
