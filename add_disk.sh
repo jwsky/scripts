@@ -60,7 +60,7 @@ fi
 # 确保需要挂载的文件夹存在
 folders=(
     "/home/navidromeuser/navidrome/music-library"
-    "/home/autosyncbackup"
+    "/home/backupfile"
     "/home/wwwroot/storage.memo.ink"
 )
 
