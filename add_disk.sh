@@ -2,15 +2,20 @@
 
 # 查询可用的硬盘设备并显示总空间、使用空间和剩余空间
 disks=($(lsblk -dn --output NAME | grep -v "loop"))
-disk_info=$(lsblk -dn --output NAME,SIZE | grep -v "loop" | while read -r name size; do
-    used_space=$(df -BG | grep "^/dev/${name}" | awk '{print $3}')
-    avail_space=$(df -BG | grep "^/dev/${name}" | awk '{print $4}')
+disk_info=()
+
+for name in "${disks[@]}"; do
+    size=$(lsblk -dn -o SIZE /dev/$name)
+    used_space=$(df -BG --output=used /dev/$name | tail -1 | tr -d ' ')
+    avail_space=$(df -BG --output=avail /dev/$name | tail -1 | tr -d ' ')
+    
     if [ -z "$used_space" ]; then
         used_space="0G"
         avail_space="$size"
     fi
-    echo "Total: $size, Used: $used_space, Avail: $avail_space"
-done)
+    
+    disk_info+=("Total: $size, Used: $used_space, Avail: $avail_space")
+done
 
 echo "可用的硬盘设备列表:"
 for i in "${!disks[@]}"; do
