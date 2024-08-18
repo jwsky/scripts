@@ -1,50 +1,54 @@
 #!/bin/bash
 
 # 查询可用的硬盘设备并显示总空间、使用空间和剩余空间
-available_disks=$(lsblk -dn --output NAME,SIZE | grep -v "loop" | while read -r name size; do
-    mount_point=$(df -h | grep "^/dev/${name}" | awk '{print $6}')
+disks=($(lsblk -dn --output NAME | grep -v "loop"))
+disk_info=$(lsblk -dn --output NAME,SIZE | grep -v "loop" | while read -r name size; do
     used_space=$(df -BG | grep "^/dev/${name}" | awk '{print $3}')
     avail_space=$(df -BG | grep "^/dev/${name}" | awk '{print $4}')
-    if [ -z "$mount_point" ]; then
+    if [ -z "$used_space" ]; then
         used_space="0G"
         avail_space="$size"
     fi
-    printf "%-8s Total: %-6s Used: %-6s Avail: %-6s\n" "$name" "$size" "$used_space" "$avail_space"
+    echo "Total: $size, Used: $used_space, Avail: $avail_space"
 done)
 
 echo "可用的硬盘设备列表:"
-echo "$available_disks"
+for i in "${!disks[@]}"; do
+    echo "$((i+1)). ${disks[$i]} (${disk_info[$i]})"
+done
 
 # 选择硬盘设备
-read -p "请选择一个硬盘设备（如：vdb）： " selected_disk
+read -p "请选择一个硬盘设备编号（如：1）： " disk_index
 
-# 确认选择
-if [ -z "$selected_disk" ]; then
-    echo "未选择任何硬盘，脚本终止。"
+# 验证选择是否有效
+if [ -z "$disk_index" ] || ! [[ "$disk_index" =~ ^[0-9]+$ ]] || [ "$disk_index" -le 0 ] || [ "$disk_index" -gt "${#disks[@]}" ]; then
+    echo "无效的选择，脚本终止。"
     exit 1
 fi
+
+selected_disk=${disks[$((disk_index-1))]}
 
 # 创建挂载点
 mount_point="/mnt/$selected_disk"
 mkdir -p $mount_point
 
-# 检查 /dev/$selected_disk1 是否已经格式化为 ext4
-if ! blkid /dev/${selected_disk}1 | grep -q "ext4"; then
-    echo "/dev/${selected_disk}1 尚未格式化为 ext4 文件系统，正在格式化..."
-    mkfs.ext4 /dev/${selected_disk}1
+# 检查 /dev/$selected_disk 是否已经格式化为 ext4
+if ! blkid /dev/${selected_disk} | grep -q "ext4"; then
+    echo "/dev/${selected_disk} 尚未格式化为 ext4 文件系统，正在格式化..."
+    mkfs.ext4 /dev/${selected_disk}
     if [ $? -ne 0 ]; then
-        echo "格式化失败，请检查 /dev/${selected_disk}1 分区是否正确。"
+        echo "格式化失败，请检查 /dev/${selected_disk} 分区是否正确。"
         exit 1
     fi
     echo "格式化完成。"
 else
-    echo "/dev/${selected_disk}1 已经格式化为 ext4 文件系统。"
+    echo "/dev/${selected_disk} 已经格式化为 ext4 文件系统。"
 fi
 
-# 挂载 /dev/$selected_disk1 到挂载点
-mount /dev/${selected_disk}1 $mount_point
+# 挂载 /dev/$selected_disk 到挂载点
+mount /dev/${selected_disk} $mount_point
 if [ $? -ne 0 ]; then
-    echo "无法挂载 /dev/${selected_disk}1 到 $mount_point，请检查文件系统类型或设备。"
+    echo "无法挂载 /dev/${selected_disk} 到 $mount_point，请检查文件系统类型或设备。"
     exit 1
 fi
 
@@ -75,7 +79,7 @@ for folder in "${folders[@]}"; do
 done
 
 # 编辑 /etc/fstab 文件以确保分区和文件夹自动挂载
-echo "/dev/${selected_disk}1  $mount_point  ext4  defaults  0  2" >> /etc/fstab
+echo "/dev/${selected_disk}  $mount_point  ext4  defaults  0  2" >> /etc/fstab
 for folder in "${folders[@]}"; do
     echo "$mount_point$(basename $folder)  $folder  none  bind  0  0" >> /etc/fstab
 done
