@@ -31,12 +31,29 @@ if [ "$fs_type" == "ext4" ]; then
     echo "/dev/${selected_disk} 已经格式化为 ext4 文件系统。"
     read -p "是否要强制重新格式化这个硬盘？输入 'format' 来确认，输入 'n' 取消操作: " confirm
     if [[ "$confirm" == "format" ]]; then
-        echo "正在卸载 /dev/${selected_disk}..."
-        umount /dev/${selected_disk}
-        if [ $? -ne 0 ]; then
-            echo "卸载失败，请检查磁盘是否被使用。"
-            exit 1
+        echo "检查是否有已挂载的分区或磁盘..."
+        mounted=$(grep -w "/dev/${selected_disk}" /proc/mounts)
+        if [ -n "$mounted" ]; then
+            echo "/dev/${selected_disk} 已挂载，正在卸载..."
+            umount /dev/${selected_disk}
+            if [ $? -ne 0 ]; then
+                echo "卸载失败，请检查磁盘是否被使用。"
+                exit 1
+            fi
         fi
+        
+        for partition in $(lsblk -ln /dev/${selected_disk} | awk '{print $1}'); do
+            if mountpoint -q /dev/$partition; then
+                echo "发现挂载的分区: /dev/$partition，正在卸载..."
+                umount -l /dev/$partition
+                if [ $? -ne 0 ]; then
+                    echo "卸载 /dev/$partition 失败，请检查分区是否被使用。"
+                    exit 1
+                fi
+            fi
+        done
+
+        echo "没有已挂载的分区或磁盘，直接进行格式化..."
         echo "正在格式化 /dev/${selected_disk}..."
         mkfs.ext4 /dev/${selected_disk}
         if [ $? -ne 0 ]; then
@@ -53,12 +70,29 @@ if [ "$fs_type" == "ext4" ]; then
 elif [ -z "$fs_type" ]; then
     read -p "你确定要格式化这个硬盘为 ext4 吗? 输入 'format' 来确认，输入 'n' 取消操作: " confirm
     if [[ "$confirm" == "format" ]]; then
-        echo "正在卸载 /dev/${selected_disk}..."
-        umount /dev/${selected_disk}
-        if [ $? -ne 0 ]; then
-            echo "卸载失败，请检查磁盘是否被使用。"
-            exit 1
+        echo "检查是否有已挂载的分区或磁盘..."
+        mounted=$(grep -w "/dev/${selected_disk}" /proc/mounts)
+        if [ -n "$mounted" ];then
+            echo "/dev/${selected_disk} 已挂载，正在卸载..."
+            umount /dev/${selected_disk}
+            if [ $? -ne 0 ]; then
+                echo "卸载失败，请检查磁盘是否被使用。"
+                exit 1
+            fi
         fi
+        
+        for partition in $(lsblk -ln /dev/${selected_disk} | awk '{print $1}'); do
+            if mountpoint -q /dev/$partition; then
+                echo "发现挂载的分区: /dev/$partition，正在卸载..."
+                umount -l /dev/$partition
+                if [ $? -ne 0 ]; then
+                    echo "卸载 /dev/$partition 失败，请检查分区是否被使用。"
+                    exit 1
+                fi
+            fi
+        done
+
+        echo "没有已挂载的分区或磁盘，直接进行格式化..."
         echo "正在格式化 /dev/${selected_disk}..."
         mkfs.ext4 /dev/${selected_disk}
         if [ $? -ne 0 ]; then
@@ -76,36 +110,66 @@ else
     echo "硬盘 /dev/${selected_disk} 当前格式为 $fs_type."
 fi
 
-# 确保需要挂载的文件夹存在
+# 将硬盘挂载到挂载点
+echo "正在将 /dev/${selected_disk} 挂载到 $mount_point..."
+mount /dev/${selected_disk} $mount_point
+if [ $? -ne 0 ]; then
+    echo "挂载 /dev/${selected_disk} 到 $mount_point 失败，请检查。"
+    exit 1
+fi
+
+# 定义需要挂载的文件夹
 folders=(
     "/home/navidromeuser/navidrome/music-library"
     "/home/backupfile"
     "/home/wwwroot/storage.memo.ink"
 )
 
+# 先卸载与这些文件夹关联的已挂载项
 for folder in "${folders[@]}"; do
-    target_mount_point="$mount_point$(basename $folder)"
+    if mountpoint -q "$folder"; then
+        echo "发现已挂载的文件夹: $folder，正在卸载..."
+        echo "umount -l \"$folder\""
+        umount -l "$folder"
+        if [ $? -ne 0 ]; then
+            echo "卸载 $folder 失败，请检查挂载状态。"
+            exit 1
+        fi
+    fi
+done
+
+# 确保 /etc/fstab 中没有重复的挂载条目，删除可能的重复条目
+for folder in "${folders[@]}"; do
+    echo "检查 /etc/fstab 中的条目并删除可能的重复条目: $folder"
+    echo "grep -q \"$folder\" /etc/fstab && sed -i \"\\|$folder|d\" /etc/fstab"
+    grep -q "$folder" /etc/fstab && sed -i "\|$folder|d" /etc/fstab
+done
+
+# 挂载文件夹到新磁盘
+for folder in "${folders[@]}"; do
+    target_mount_point="${mount_point}/$(basename $folder)"
+    echo "创建目标挂载点: mkdir -p $folder"
     mkdir -p $folder  # 确保挂载目标文件夹存在
+
+    echo "创建挂载源文件夹: mkdir -p $target_mount_point"
     mkdir -p $target_mount_point  # 确保挂载源文件夹存在
 
-    # 挂载文件夹到硬盘
+    echo "尝试挂载文件夹: mount --bind $target_mount_point $folder"
     if ! mount --bind $target_mount_point $folder; then
         echo "挂载 $target_mount_point 到 $folder 失败，请检查。"
         exit 1
     else
         echo "$folder 已成功挂载到 $target_mount_point"
     fi
-done
 
-# 编辑 /etc/fstab 文件以确保分区和文件夹自动挂载
-echo "/dev/${selected_disk}  $mount_point  ext4  defaults  0  2" >> /etc/fstab
-for folder in "${folders[@]}"; do
+    # 编辑 /etc/fstab 文件以确保分区和文件夹自动挂载
+    echo "编辑 /etc/fstab 文件以确保自动挂载: echo \"$target_mount_point  $folder  none  bind  0  0\" >> /etc/fstab"
     echo "$target_mount_point  $folder  none  bind  0  0" >> /etc/fstab
 done
 
 # 验证挂载是否成功
-mount -a
 for folder in "${folders[@]}"; do
+    echo "检查挂载状态: mount | grep -q \"$folder\""
     if mount | grep -q "$folder"; then
         echo "$folder 挂载成功"
     else
