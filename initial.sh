@@ -11,6 +11,7 @@ echo "6）更换ubuntu更新源"
 echo "7）挂载数据盘，并把文件夹挂载上去"
 echo "8）lnmp自动添加域名"
 echo "9）安装或运行Capswriter"
+echo "10）备份核心目录初始化"
 
 
 
@@ -75,15 +76,18 @@ add_disk() {
 }
 
 add_domain() {
-    echo "正在挂载数据盘到/home，请稍等..."
+    echo "正在设置，请稍等..."
     wget -O add_domain.sh https://gt.theucd.com/jwsky/scripts/main/add_domain.sh && bash add_domain.sh
 }
 
 caps() {
-    echo "正在挂载数据盘到/home，请稍等..."
+    echo "正在设置，请稍等..."
     wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && bash caps.sh
 }
-
+backup_website_setting(){
+  echo "正在设置，请稍等..."
+    wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && bash caps.sh
+}
 case $choice in
     1)
         # 调用方法，并传入时间差阈值（以天为单位）
@@ -122,6 +126,9 @@ case $choice in
         ;; 
     9)
         caps
+        ;; 
+    10)
+        backup_website_setting
         ;; 
     *)
         echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8"
