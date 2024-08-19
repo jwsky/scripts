@@ -118,6 +118,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# 添加硬盘的挂载信息到 /etc/fstab
+echo "添加 /dev/${selected_disk} 的挂载信息到 /etc/fstab..."
+echo "/dev/${selected_disk}  $mount_point  ext4  defaults  0  2" >> /etc/fstab
+
 # 定义需要挂载的文件夹
 folders=(
     "/home/navidromeuser/navidrome/music-library"
