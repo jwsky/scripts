@@ -85,8 +85,8 @@ caps() {
     wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && bash caps.sh
 }
 backup_website_setting(){
-  echo "正在设置，请稍等..."
-    wget -O caps.sh https://gt.theucd.com/jwsky/scripts/main/caps.sh && bash caps.sh
+    echo "正在设置，请稍等..."
+    wget -O backup_website_setting.sh https://gt.theucd.com/jwsky/scripts/main/backup_website_setting.sh && bash backup_website_setting.sh
 }
 case $choice in
     1)
