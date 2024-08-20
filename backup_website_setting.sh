@@ -130,21 +130,21 @@ elif [ "$choice" = "2" ]; then
     rm -f "$encrypted_file"
 
     # 检查并创建挂载点目录
-    if [ ! -d "/home/backfile/autosyncbackup" ]; then
+    if [ ! -d "/home/backupfile/autosyncbackup" ]; then
         echo "挂载点目录不存在，正在创建..."
-        sudo mkdir -p /home/backfile/autosyncbackup
+        sudo mkdir -p /home/backupfile/autosyncbackup
     fi
 
     # 设置 Rclone 挂载为开机启动
     echo "正在设置 Rclone 挂载为开机启动..."
-    echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/backfile/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
+    echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/backupfile/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
 
     if [ $? -eq 0 ]; then
         echo "Rclone 挂载已设置为开机启动。"
 
         # 立即执行挂载命令
         echo "正在立即挂载 Rclone..."
-        rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/backfile/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --vfs-cache-mode full -vv
+        rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/backupfile/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --vfs-cache-mode full -vv
 
         if [ $? -eq 0 ]; then
             echo "Rclone 已成功挂载。"
