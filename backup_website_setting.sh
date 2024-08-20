@@ -130,17 +130,16 @@ elif [ "$choice" = "2" ]; then
     rm -f "$encrypted_file"
 
 
-
-    # 检查 /mnt/sdb/backupfile/autosyncbackup 是否存在
-    if [ -d "/mnt/sdb/backupfile/autosyncbackup" ]; then
-        echo "/mnt/sdb/backupfile/autosyncbackup 目录存在，使用该路径作为挂载点..."
-        backupfilepath="/mnt/sdb/backupfile/autosyncbackup"
+    # 检查 /mnt/sdb/autosyncbackup 是否存在
+    if [ -d "/mnt/sdb/autosyncbackup" ]; then
+        echo "/mnt/sdb/autosyncbackup 目录存在，使用该路径作为挂载点..."
+        backupfilepath="/mnt/sdb/autosyncbackup"
     else
-        echo "/mnt/sdb/backupfile/autosyncbackup 目录不存在，设置默认挂载路径..."
+        echo "/mnt/sdb/autosyncbackup 目录不存在，设置默认挂载路径..."
         # 检查并创建挂载点目录
         if [ ! -d "/home/autosyncbackup" ]; then
             echo "挂载点目录不存在，正在创建..."
-            sudo mkdir -p /home/backupfile/autosyncbackup
+            sudo mkdir -p /home/autosyncbackup
         fi
         backupfilepath="/home/autosyncbackup"
     fi
