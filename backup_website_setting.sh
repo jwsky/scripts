@@ -154,8 +154,8 @@ elif [ "$choice" = "2" ]; then
 
         # 立即执行挂载命令
         echo "正在立即挂载 Rclone..."
-        rclone mount odwebsitejava:/autobackup_sync/$current_server_name $backupfilepath --copy-links --allow-other --allow-non-empty --umask 000  --daemon --vfs-cache-mode full -vv
-
+        rclone mount odwebsitejava:/autobackup_sync/$current_server_name $backupfilepath --copy-links --allow-other --allow-non-empty --umask 000  --daemon --vfs-cache-mode full 
+        echo "如果要 debug，可以加这个参数-vv"
         if [ $? -eq 0 ]; then
             echo "Rclone 已成功挂载。"
         else
