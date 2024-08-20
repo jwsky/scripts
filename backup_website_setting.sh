@@ -129,22 +129,32 @@ elif [ "$choice" = "2" ]; then
     # 清理当前目录中的加密文件
     rm -f "$encrypted_file"
 
-    # 检查并创建挂载点目录
-    if [ ! -d "/home/backupfile/autosyncbackup" ]; then
-        echo "挂载点目录不存在，正在创建..."
-        sudo mkdir -p /home/backupfile/autosyncbackup
+
+
+    # 检查 /mnt/sdb/backupfile/autosyncbackup 是否存在
+    if [ -d "/mnt/sdb/backupfile/autosyncbackup" ]; then
+        echo "/mnt/sdb/backupfile/autosyncbackup 目录存在，使用该路径作为挂载点..."
+        backupfilepath="/mnt/sdb/backupfile/autosyncbackup"
+    else
+        echo "/mnt/sdb/backupfile/autosyncbackup 目录不存在，设置默认挂载路径..."
+        # 检查并创建挂载点目录
+        if [ ! -d "/home/autosyncbackup" ]; then
+            echo "挂载点目录不存在，正在创建..."
+            sudo mkdir -p /home/backupfile/autosyncbackup
+        fi
+        backupfilepath="/home/autosyncbackup"
     fi
 
     # 设置 Rclone 挂载为开机启动
     echo "正在设置 Rclone 挂载为开机启动..."
-    echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/backupfile/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
+    echo "@reboot rclone mount odwebsitejava:/autobackup_sync/$current_server_name $backupfilepath --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
 
     if [ $? -eq 0 ]; then
         echo "Rclone 挂载已设置为开机启动。"
 
         # 立即执行挂载命令
         echo "正在立即挂载 Rclone..."
-        rclone mount odwebsitejava:/autobackup_sync/$current_server_name /home/backupfile/autosyncbackup --copy-links --allow-other --allow-non-empty --umask 000 --vfs-cache-mode full -vv
+        rclone mount odwebsitejava:/autobackup_sync/$current_server_name $backupfilepath --copy-links --allow-other --allow-non-empty --umask 000 --vfs-cache-mode full -vv
 
         if [ $? -eq 0 ]; then
             echo "Rclone 已成功挂载。"
@@ -159,7 +169,10 @@ elif [ "$choice" = "2" ]; then
 
     # 下载备份脚本
     echo "正在下载备份脚本..."
-    wget -O backup_website.sh https://gt.theucd.com/jwsky/scripts/main/backup_website.sh
+    wget -O /root/backup_website.sh https://gt.theucd.com/jwsky/scripts/main/backup_website.sh
+
+    # 替换下载的备份脚本中的默认路径为 backupfilepath 变量值
+    sed -i "s|Backup_Home=\"/home/autosyncbackup/\"|Backup_Home=\"$backupfilepath\"|g" /root/backup_website.sh
 
     # 询问用户输入 MySQL 密码
     read -sp "请输入 MySQL 密码: " MYSQL_PassWord
@@ -178,6 +191,7 @@ elif [ "$choice" = "2" ]; then
     (crontab -l 2>/dev/null; echo "0 9 * * * /root/backup_website.sh") | crontab -
 
     echo "Rclone 和备份脚本已安装，并已设置为每天早上9点定时备份。"
+
 else
     echo "无效选项，请选择 1 或 2。"
     exit 1
