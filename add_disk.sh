@@ -125,7 +125,6 @@ echo "/dev/${selected_disk}  $mount_point  ext4  defaults  0  2" >> /etc/fstab
 # 定义需要挂载的文件夹
 folders=(
     "/home/navidromeuser/navidrome/music-library"
-    "/home/backupfile"
     "/home/wwwroot/storage.memo.ink"
 )
 
@@ -181,5 +180,5 @@ for folder in "${folders[@]}"; do
         exit 1
     fi
 done
-
+mkdir -p /mnt/sdb/autosyncbackup
 echo "脚本执行完毕"
