@@ -4,8 +4,8 @@
 # 重要提示：请设置以下值！
 
 echo $(date) >> file.txt
-
-Backup_Home="/home/autosyncbackup/"
+mkdir -p /home/backupfile/autosyncbackup/
+Backup_Home="/home/backupfile/autosyncbackup/"
 MySQL_Dump="/usr/local/mysql/bin/mysqldump"
 ######~设置要备份的目录~######
 Backup_Dir=("/home/wwwroot" "/usr/local/nginx/conf/vhost" "/home/a/nextjs")
