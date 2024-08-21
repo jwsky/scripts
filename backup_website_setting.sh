@@ -146,7 +146,7 @@ elif [ "$choice" = "2" ]; then
 
     # 设置 Rclone 挂载为开机启动
     echo "正在设置 Rclone 挂载为开机启动..."
-    echo "@reboot sleep 15 && rclone mount odwebsitejava:/autobackup_sync/$current_server_name $backupfilepath --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
+    echo "@reboot root sleep 3 && rclone mount odwebsitejava:/autobackup_sync/$current_server_name $backupfilepath --copy-links --allow-other --allow-non-empty --umask 000 --daemon --vfs-cache-mode full" | sudo tee -a /etc/crontab > /dev/null
 
     if [ $? -eq 0 ]; then
         echo "Rclone 挂载已设置为开机启动。"
