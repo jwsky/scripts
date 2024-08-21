@@ -11,7 +11,7 @@ echo "6）更换ubuntu更新源"
 echo "7）挂载数据盘，并把文件夹挂载上去"
 echo "8）lnmp自动添加域名"
 echo "9）安装或运行Capswriter"
-echo "10）备份核心目录初始化"
+echo "10）自动化备份核心目录"
 
 
 
