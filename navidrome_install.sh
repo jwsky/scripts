@@ -1,5 +1,6 @@
 #!/bin/bash
 #wget -O navidrome_install.sh https://gt.theucd.com/jwsky/scripts/main/navidrome_install.sh&& sh navidrome_install.sh
+
 # 定义用户名、用户组和下载文件名
 USER="navidromeuser"
 GROUP="navidromegroup"
@@ -8,16 +9,6 @@ FILENAME="navidrome_${VERSION}_linux_amd64.tar.gz"
 
 #DOWNLOAD_URL="https://github.com/navidrome/navidrome/releases/download/v${VERSION}/${FILENAME}"
 DOWNLOAD_URL="https://s.theucd.com/file/${FILENAME}"
-
-
-# 检查用户是否存在，如果不存在则创建用户和用户组
-if ! id "$USER" &>/dev/null; then
-	    echo "用户 $USER 不存在，正在创建..."
-	        sudo groupadd -f $GROUP
-		    sudo useradd -m -g $GROUP $USER
-	    else
-		        echo "用户 $USER 已存在，无需创建。"
-fi
 
 # 定义检查和升级的方法
 check_and_upgrade() {
@@ -61,19 +52,28 @@ HOME_DIR="/home/$USER"
 NAVIDROME_DIR="$HOME_DIR/navidrome"
 sudo mkdir -p $NAVIDROME_DIR
 sudo mkdir -p $NAVIDROME_DIR/bin
-mkdir -p $NAVIDROME_DIR/music-library
 mkdir -p $NAVIDROME_DIR/config
+
+# 设置音乐文件夹路径
+MUSIC_FOLDER_PATH="/mnt/sdb/music-library"
+
+if [ -d "$MUSIC_FOLDER_PATH" ]; then
+    sudo chown -R $USER:$GROUP "$MUSIC_FOLDER_PATH"
+else
+    mkdir -p $NAVIDROME_DIR/music-library
+    MUSIC_FOLDER_PATH="$NAVIDROME_DIR/music-library"
+fi
+
 # 赋予文件夹适当的权限
 sudo chown -R $USER:$GROUP $NAVIDROME_DIR
 
 # 检查文件是否存在于当前脚本执行的目录下
 if [ ! -f "./$FILENAME" ]; then
-	    echo "文件 $FILENAME 不存在于当前目录下，正在下载..."
-	        wget $DOWNLOAD_URL -O $FILENAME
+    echo "文件 $FILENAME 不存在于当前目录下，正在下载..."
+    wget $DOWNLOAD_URL -O $FILENAME
 fi
 
 # 复制文件到 bin 目录
-
 echo "复制文件到 $NAVIDROME_DIR/bin/"
 ls -l /root/$FILENAME
 sudo cp -n /root/$FILENAME $NAVIDROME_DIR/bin/
@@ -81,12 +81,12 @@ sudo cp -n /root/$FILENAME $NAVIDROME_DIR/bin/
 # 解压文件
 cd $NAVIDROME_DIR/bin
 if [ ! -d "navidrome" ]; then
-	    echo "解压文件 $FILENAME ..."
-	        sudo tar -xvzf $FILENAME
+    echo "解压文件 $FILENAME ..."
+    sudo tar -xvzf $FILENAME
 fi
-#cd -
+
 # 创建配置文件
-echo "MusicFolder = \"$NAVIDROME_DIR/music-library\"" | sudo tee $NAVIDROME_DIR/config/navidrome.toml
+echo "MusicFolder = \"$MUSIC_FOLDER_PATH\"" | sudo tee $NAVIDROME_DIR/config/navidrome.toml
 
 # 创建 Systemd 服务单元
 SERVICE_FILE="/etc/systemd/system/navidrome.service"
