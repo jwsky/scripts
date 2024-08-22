@@ -1,11 +1,4 @@
 #!/bin/bash
-
-# 检查是否在 screen 环境中运行
-if [ -z "$STY" ]; then
-  echo "Error: 该脚本必须在 screen 环境中运行。请先进入 screen 会话后再重新运行脚本。"
-  exit 1
-fi
-
 # 提供安装和运行的选项
 echo "请选择操作: "
 echo "1) 安装"
@@ -41,16 +34,39 @@ case $choice in
     # 7. 安装依赖，使用清华源
     apt install python3-pip -y
     pip3 install -r capswriter/requirements-server.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+    # 8. 创建 systemd 服务文件以在开机时自动启动
+    echo "创建 systemd 服务文件..."
+    cat <<EOT > /etc/systemd/system/capswriter.service
+[Unit]
+Description=CapsWriter Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 $(pwd)/capswriter/start_server.py
+WorkingDirectory=$(pwd)/capswriter
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOT
+
+    # 9. 重新加载 systemd，启用并启动服务
+    systemctl daemon-reload
+    systemctl enable capswriter.service
+    systemctl start capswriter.service
+
+    echo "安装并配置开机自启动完成。"
+
     ;;
   2)
     # 仅运行服务器
     echo "运行服务器..."
+    systemctl restart capswriter.service
     ;;
   *)
     echo "无效的选项，退出。"
     exit 1
     ;;
 esac
-
-# 8. 运行 start_server.py
-python3 capswriter/start_server.py
