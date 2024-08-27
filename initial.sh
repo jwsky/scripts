@@ -12,6 +12,7 @@ echo "7）挂载数据盘，并把文件夹挂载上去"
 echo "8）lnmp自动添加域名"
 echo "9）安装或运行Capswriter"
 echo "10）自动化备份核心目录"
+echo "11）修改ssh默认端口"
 
 
 
@@ -88,6 +89,32 @@ backup_website_setting(){
     echo "正在设置，请稍等..."
     wget -O backup_website_setting.sh https://gt.theucd.com/jwsky/scripts/main/backup_website_setting.sh && bash backup_website_setting.sh
 }
+
+modify_ssh_port() {
+    # 提示用户输入端口号
+    read -p "请输入新的 SSH 端口号: " port
+
+    # 检查用户输入是否为有效的端口号（1-65535之间的数字）
+    if [[ $port -ge 1 && $port -le 65535 ]]; then
+        # 备份 SSH 配置文件
+        cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+        # 修改 SSH 配置文件中的端口号，如果已存在Port行则替换，否则添加新行
+        if grep -q "^Port " /etc/ssh/sshd_config; then
+            sed -i "s/^Port .*/Port $port/" /etc/ssh/sshd_config
+        else
+            echo "Port $port" >> /etc/ssh/sshd_config
+        fi
+
+        # 重启 SSH 服务
+        systemctl restart sshd
+
+        echo "SSH 端口已修改为 $port，并已重启 SSH 服务。"
+    else
+        echo "无效端口号。请输入 1 到 65535 之间的数字。"
+    fi
+}
+
 case $choice in
     1)
         # 调用方法，并传入时间差阈值（以天为单位）
@@ -129,6 +156,9 @@ case $choice in
         ;; 
     10)
         backup_website_setting
+        ;; 
+    11)
+        modify_ssh_port
         ;; 
     *)
         echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8"
