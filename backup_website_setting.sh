@@ -187,7 +187,7 @@ elif [ "$choice" = "2" ]; then
     crontab -l | grep -v "backup_website.sh" | crontab -
 
     # 设置 crontab 任务，每天早上9点执行备份
-    (crontab -l 2>/dev/null; echo "0 9 * * * /root/backup_website.sh") | crontab -
+    (crontab -l 2>/dev/null; echo "0 9 * * * /bin/bash /root/backup_website.sh") | crontab -
 
     echo "Rclone 和备份脚本已安装，并已设置为每天早上9点定时备份。"
 
