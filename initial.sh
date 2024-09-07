@@ -13,10 +13,12 @@ echo "8）lnmp自动添加域名"
 echo "9）安装或运行Capswriter"
 echo "10）自动化备份核心目录"
 echo "11）修改ssh默认端口"
+echo "12）rinetd设置"
 
 
 
-read -p "请输入选项 (1, 2, 3, 4, 5, 6, 7 ,8 , 9 , 10 , 11 ): " choice
+
+read -p "请输入选项 (1, 2, 3, 4, 5, 6, 7 ,8 , 9 , 10 , 11, 12 ): " choice
 
 # 定义检查和升级的方法
 check_and_upgrade() {
