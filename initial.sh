@@ -89,6 +89,10 @@ backup_website_setting(){
     echo "正在设置，请稍等..."
     wget -O backup_website_setting.sh https://gt.theucd.com/jwsky/scripts/main/backup_website_setting.sh && bash backup_website_setting.sh
 }
+rinetd_setting(){
+    echo "正在设置，请稍等..."
+    wget -O rinetd.sh https://gt.theucd.com/jwsky/scripts/main/rinetd.sh && bash rinetd.sh
+}
 
 modify_ssh_port() {
     # 提示用户输入端口号
@@ -160,7 +164,10 @@ case $choice in
     11)
         modify_ssh_port
         ;; 
+    12)
+        rinetd_setting
+        ;;
     *)
-        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8"
+        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8 9 10 11 12"
         ;;
 esac
