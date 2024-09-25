@@ -114,6 +114,8 @@ modify_ssh_port() {
 
         # 重启 SSH 服务
         systemctl restart sshd
+        systemctl restart ssh
+
 
         echo "SSH 端口已修改为 $port，并已重启 SSH 服务。"
     else
