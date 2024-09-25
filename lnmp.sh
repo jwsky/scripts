@@ -60,7 +60,7 @@ else
 fi
 
 # 下载并解压LNMP
-wget https://soft.lnmp.com/lnmp/lnmp2.1.tar.gz -O lnmp2.1.tar.gz
+wget https://soft.theucd.com/lnmp/lnmp2.1.tar.gz -O lnmp2.1.tar.gz
 tar zxf lnmp2.1.tar.gz
 cd lnmp2.1
 
