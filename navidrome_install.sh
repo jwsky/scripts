@@ -46,7 +46,14 @@ check_and_upgrade 30
 
 
 sudo apt install vim ffmpeg -y
-
+# 检查用户是否存在，如果不存在则创建用户和用户组
+if ! id "$USER" &>/dev/null; then
+	    echo "用户 $USER 不存在，正在创建..."
+	        sudo groupadd -f $GROUP
+		    sudo useradd -m -g $GROUP $USER
+	    else
+		        echo "用户 $USER 已存在，无需创建。"
+fi
 # 创建目录结构
 HOME_DIR="/home/$USER"
 NAVIDROME_DIR="$HOME_DIR/navidrome"
