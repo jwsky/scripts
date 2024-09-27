@@ -1,4 +1,18 @@
 #!/bin/bash
+#!/bin/bash
+
+# Get Ubuntu version
+version=$(lsb_release -r | awk '{print $2}' | cut -d '.' -f1)
+
+# Check if version is greater than or equal to 24
+if [ "$version" -ge 24 ]; then
+  # Run the commands
+  curl -O http://launchpadlibrarian.net/646633572/libaio1_0.3.113-4_amd64.deb
+  sudo dpkg -i libaio1_0.3.113-4_amd64.deb
+else
+  echo "Ubuntu version is less than 24. Skipping the commands."
+fi
+
 
 # 检查是否传入 MySQL 密码参数
 if [ -z "$1" ]; then
