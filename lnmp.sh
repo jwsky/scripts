@@ -8,7 +8,10 @@ version=$(lsb_release -r | awk '{print $2}' | cut -d '.' -f1)
 if [ "$version" -ge 24 ]; then
   # Run the commands
   curl -O http://launchpadlibrarian.net/646633572/libaio1_0.3.113-4_amd64.deb
+  wget http://mirrors.kernel.org/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
   sudo dpkg -i libaio1_0.3.113-4_amd64.deb
+  sudo dpkg -i libtinfo5_6.3-2ubuntu0.1_amd64.deb
+
 else
   echo "Ubuntu version is less than 24. Skipping the commands."
 fi
