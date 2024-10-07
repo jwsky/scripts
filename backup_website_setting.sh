@@ -42,6 +42,7 @@ if [ "$choice" = "1" ]; then
     exit 0
 
 elif [ "$choice" = "2" ]; then
+
     # 安装 Rclone 并设置自动备份
 
     echo "正在检查并安装 crontab..."
