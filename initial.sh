@@ -13,7 +13,8 @@ echo "8）lnmp自动添加域名"
 echo "9）安装或运行Capswriter"
 echo "10）自动化备份核心目录"
 echo "11）修改ssh默认端口"
-echo "12）rinetd设置"
+echo "12）rinetd转发安装和设置"
+echo "12）设置python API服务自动开机启动"
 
 
 
@@ -177,6 +178,6 @@ case $choice in
         python_api_service
         ;;
     *)
-        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8 9 10 11 12"
+        echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8 9 10 11 12 13"
         ;;
 esac
