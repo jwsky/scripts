@@ -123,7 +123,7 @@ modify_ssh_port() {
     fi
 }
 python_api_service()    {
-(crontab -l 2>/dev/null; echo "@reboot python3 /root/py/tool_service.py") | crontab -
+(crontab -l 2>/dev/null; echo "@reboot python3 /root/py/tool_service.py") | crontab - && crontab -l
 }
 case $choice in
     1)
