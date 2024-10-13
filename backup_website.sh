@@ -7,7 +7,7 @@ Backup_Home="/home/autosyncbackup/"
 MySQL_Dump="/usr/local/mysql/bin/mysqldump"
 ######~设置要备份的目录~######
 Backup_Dir=("/home/wwwroot" "/usr/local/nginx/conf/vhost" "/home/a/nextjs")
-Exclude_Dir=("wwwroot/soft.theucd.com" "wwwroot/m.theucd.com" "wwwroot/jslack.theucd.com/raw" "wwwroot/pam")
+Exclude_Dir=("wwwroot/soft.theucd.com" "wwwroot/m.theucd.com" "wwwroot/jslack.theucd.com/raw" "wwwroot/pam"  "wwwroot/default")
 ######~设置MySQL用户名和密码~######
 MYSQL_UserName='root'
 MYSQL_PassWord=''
