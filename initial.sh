@@ -122,7 +122,9 @@ modify_ssh_port() {
         echo "无效端口号。请输入 1 到 65535 之间的数字。"
     fi
 }
-
+python_api_service()    {
+(crontab -l 2>/dev/null; echo "@reboot python3 /root/py/tool_service.py") | crontab -
+}
 case $choice in
     1)
         # 调用方法，并传入时间差阈值（以天为单位）
@@ -170,6 +172,9 @@ case $choice in
         ;; 
     12)
         rinetd_setting
+        ;;
+    13)
+        python_api_service
         ;;
     *)
         echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8 9 10 11 12"
