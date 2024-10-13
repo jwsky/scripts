@@ -75,5 +75,5 @@ find "$Backup_Home" -type f -name "*${current_date}.sql" -print0 | tar -czvf "$T
 echo "归档 ${Today_db_archive_name_connected} 已创建，原始文件已删除。"
 
 echo "不会删除旧的备份文件..."
-#rm -f ${Backup_Home}${OldWWWBackup}
-#rm -f ${Backup_Home}${OldDB_tar_Backup}
+rm -f ${Backup_Home}${OldWWWBackup}
+rm -f ${Backup_Home}${OldDB_tar_Backup}
