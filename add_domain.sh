@@ -40,7 +40,7 @@ if ! command -v expect >/dev/null 2>&1; then
 fi
 
 # 检测本机外网IP
-external_ip=$(curl -s ifconfig.me)
+external_ip=$(curl -s -4 ifconfig.me)
 echo "本机外网IP: $external_ip"
 
 # 检查是否有公开服务
