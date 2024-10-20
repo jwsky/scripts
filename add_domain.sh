@@ -42,6 +42,8 @@ fi
 # 检测本机外网IP
 external_ip=$(curl -s -4 ifconfig.me)
 echo "本机外网IP: $external_ip"
+echo "准备安装netcat ：nc工具"
+
 apt install netcat
 # 检查是否有公开服务
 nc -z -v -w5 $external_ip 80
