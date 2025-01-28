@@ -193,6 +193,7 @@ elif [ "$choice" = "2" ]; then
     (crontab -l 2>/dev/null; echo "0 9 * * * /bin/bash /root/backup_website.sh") | crontab -
 
     echo "Rclone 和备份脚本已安装，并已设置为每天早上9点定时备份。"
+    [ -f "./backup_website_setting.sh" ] && rm "./backup_website_setting.sh" && echo "文件已删除。" || echo "文件不存在。"
 
 else
     echo "无效选项，请选择 1 或 2。"
