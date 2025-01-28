@@ -77,7 +77,7 @@ elif [ "$choice" = "2" ]; then
 
     # 下载并修改 Rclone 安装脚本
     echo "正在下载 Rclone 安装脚本..."
-    wget -O rclone_install.sh https://rclone.org/install.sh
+    wget -O rclone_install.sh https://s.theucd.com/pxy/pxy.php?des=https://rclone.org/install.sh
 
     if [ $? -eq 0 ]; then
         echo "正在修改 Rclone 安装脚本..."
