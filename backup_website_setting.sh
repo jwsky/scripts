@@ -82,6 +82,8 @@ elif [ "$choice" = "2" ]; then
     if [ $? -eq 0 ]; then
         echo "正在修改 Rclone 安装脚本..."
         sed -i 's|https://downloads.rclone.org|https://s.theucd.com/pxy/pxy.php?des=https://downloads.rclone.org|g' rclone_install.sh
+        sed -i '/curl -OfsS \"$download_link\"/a mv "pxy.php" "$rclone_zip"' rclone_install.sh
+
 
         echo "正在执行修改后的 Rclone 安装脚本..."
         sudo bash rclone_install.sh
