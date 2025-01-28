@@ -154,3 +154,4 @@ expect {
 expect eof
 EOF
 #echo "已生成 MySQL 密码,请务必立刻登录系统修改：$MYSQL_PASSWORD" >> ../lnmp-install.log
+[ -f "./lnmp.sh" ] && rm "./lnmp.sh" && echo "文件已删除。" || echo "文件不存在。"
