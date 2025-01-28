@@ -181,3 +181,4 @@ case $choice in
         echo "无效的选择，请输入1, 2, 3, 4, 5 或 6 或 7 或 8 9 10 11 12 13"
         ;;
 esac
+[ -f "./initial.sh" ] && rm "./initial.sh" && echo "文件已删除。" || echo "文件不存在。"
