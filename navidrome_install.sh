@@ -4,7 +4,7 @@
 # 定义用户名、用户组和下载文件名
 USER="navidromeuser"
 GROUP="navidromegroup"
-VERSION="0.52.5"
+VERSION="0.56.1"
 FILENAME="navidrome_${VERSION}_linux_amd64.tar.gz"
 
 #DOWNLOAD_URL="https://github.com/navidrome/navidrome/releases/download/v${VERSION}/${FILENAME}"
