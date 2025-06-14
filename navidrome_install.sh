@@ -7,6 +7,7 @@ GROUP="navidromegroup"
 VERSION="0.56.1"
 FILENAME="navidrome_${VERSION}_linux_amd64.tar.gz"
 
+
 #DOWNLOAD_URL="https://github.com/navidrome/navidrome/releases/download/v${VERSION}/${FILENAME}"
 DOWNLOAD_URL="https://s.theucd.com/file/${FILENAME}"
 
